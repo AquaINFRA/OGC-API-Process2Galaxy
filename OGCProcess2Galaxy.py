@@ -16,7 +16,12 @@ typeMapping = {
 }
 
 #Recognized media types
-mediaTypes = ["image/tiff", "image/jpeg", "image/png", "text/xml", "text/plain", "application/octet-stream"]
+mediaTypes = ["image/tiff", 
+              "image/jpeg", 
+              "image/png", 
+              "text/xml", 
+              "text/plain", 
+              "application/octet-stream"]
 
 #Conformance classes 
 confClasses = [
@@ -119,6 +124,9 @@ def OGCAPIProcesses2Galaxy(configFile: str) -> None:
 
     index_i = 0
     for api in configJSON["servers"]: 
+        #get server 
+        server = api["server_url"]
+
         index_i += 1
 
         #check conformance
@@ -200,19 +208,23 @@ def OGCAPIProcesses2Galaxy(configFile: str) -> None:
                             
                             #set param title
                             if "title" in process["inputs"][param].keys():
-                                process_input.set("label", param)
-                                #process_input.set("label", process["inputs"][param]["title"])
+                                #process_input.set("label", param)
+                                process_input.set("label", process["inputs"][param]["title"])
                             else:
                                 process_input.set("label", param)
 
                             #check if param is optional
+                            optional = False
                             if "nullable" in process["inputs"][param]["schema"].keys():    
                                 if process["inputs"][param]["schema"]["nullable"]:
                                     process_input.set("optional", "true")
-                            else:
+                                    optional = True
+                            if "minOccurs" in process["inputs"][param].keys():
+                                if process["inputs"][param]["minOccurs"] == 0:
+                                    process_input.set("optional", "true")
+                                    optional = True
+                            if optional == False:
                                 process_input.set("optional", "false")
-                                if "type" in process["inputs"][param]["schema"]:
-                                    process_input.set("value", "")
 
                             #set default
                             if "default" in process["inputs"][param]["schema"].keys():
@@ -222,7 +234,7 @@ def OGCAPIProcesses2Galaxy(configFile: str) -> None:
                             if "description" in process["inputs"][param].keys():
                                 process_input.set("help", process["inputs"][param]["description"])
                             else:
-                                process_input.set("help", "No description provided!")
+                                process_input.set("help", "")
 
                             #Retrive simple or extented schema
                             if("extended-schema" in process["inputs"][param].keys()):
@@ -307,6 +319,7 @@ def OGCAPIProcesses2Galaxy(configFile: str) -> None:
     #add command
     commandText = "<![CDATA["
     commandText += "\n\tRscript '$__tool_directory__/generic.R'\n"
+    commandText += "\t\t--server '" + server + "'\n"
     commandText += "\t\t--outputData '$output_data'"
     commandText += "\n]]>"
     command.text = commandText

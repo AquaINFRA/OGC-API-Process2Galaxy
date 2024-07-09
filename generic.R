@@ -136,15 +136,16 @@ is_url <- function(x) {
   grepl("^https?://", x)
 }
 
-server <- "https://hirondelle.crim.ca/weaver/" #ogc-tb-16
-#server <- "https://ospd.geolabs.fr:8300/ogc-api/" #aqua-infra
-
 print("--> Retrieve parameters")
 inputParameters <- getParameters()
+print(inputParameters)
 print("--> Parameters retrieved")
 
 args <- commandArgs(trailingOnly = TRUE)
-outputLocation <- args[2]
+
+server <- args[2]
+
+outputLocation <- args[4]
 
 print("--> Retrieve outputs")
 outputs <- getOutputs(inputParameters, outputLocation, server)
@@ -153,7 +154,6 @@ print("--> Outputs retrieved")
 print("--> Parse inputs")
 convertedKeys <- c()
 for (key in names(inputParameters)) {
-  #print(inputParameters[[key]])
   if (is.character(inputParameters[[key]]) && (endsWith(inputParameters[[key]], ".dat") || endsWith(inputParameters[[key]], ".txt"))) { 
     con <- file(inputParameters[[key]], "r")
     url_list <- list()
@@ -192,7 +192,6 @@ for (key in names(inputParameters)) {
       convertedKey <- paste(convertedKey, paste(part, "_", sep=""), sep="")
     }
     convertedKey <- substr(convertedKey, 1, nchar(convertedKey)-1)
-    #print(paste("--> converted key:", convertedKey))
 }
 
     inputParameters[[key]] <- convertedValues
