@@ -5,7 +5,7 @@ import warnings
 import sys
 import xml.dom.minidom as md
 
-#OGC Process Description types to Galaxy Parameter types
+#OGC Process Description types to galaxy parameter types
 typeMapping = {
   "array": "text",
   "boolean": "boolean",
@@ -15,9 +15,15 @@ typeMapping = {
   "string": "text"
 }
 
-mediaTypes = ["image/tiff", "image/jpeg", "image/png"]
+#Recognized media types
+mediaTypes = ["image/tiff", 
+              "image/jpeg", 
+              "image/png", 
+              "text/xml", 
+              "text/plain", 
+              "application/octet-stream"]
 
-#conformance classes 
+#Conformance classes 
 confClasses = [
 "http://www.opengis.net/spec/ogcapi-processes-1/1.0/conf/core",
 "http://www.opengis.net/spec/ogcapi-processes-1/1.0/conf/ogc-process-description",
@@ -57,13 +63,21 @@ def OGCAPIProcesses2Galaxy(configFile: str) -> None:
     Parameters:
     configFile (str): Path to config file which specifies the instances as well as 
     included and excluded services. Example: 
-    [
-        {
-            "server_url": "https://someOGCAPIProcessesInstace/api/",
-            "included_services": ["*"],
-            "excluded_services": ["process1", "process45"]
-        }
-    ]
+    {
+        "servers":[
+            {
+                "server_url": "https://exampleEndpoint",
+                "included_services": ["*"],
+                "filter": "",
+                "excluded_services": []
+            }
+        ],
+        "id":"exampleToolID",
+        "title":"Example title",
+        "version":"0.1.0",
+        "description": "Some description text.",
+        "help": "Some help text."
+    }
 
     Returns:
     None: Function has no return value. Converted processes are stores as .xml-files.
@@ -81,8 +95,12 @@ def OGCAPIProcesses2Galaxy(configFile: str) -> None:
 
     #add description
     description = ET.Element("description")
-    description.text = "executes remote processes"
+    description.text = configJSON["description"]
     tool.append(description)
+    
+    #add help
+    help = ET.Element("help")
+    help.text = configJSON["help"]
 
     #add macro
     macros = ET.Element("macros")
@@ -104,37 +122,38 @@ def OGCAPIProcesses2Galaxy(configFile: str) -> None:
     #add inputs
     inputs = ET.Element("inputs")
 
-    #conditional_server = ET.Element("conditional")
-    #conditional_server.set("name", "conditional_server")
-    #select_server = ET.Element("param")
-    #select_server.set("name", "select_server")
-    #select_server.set("type", "select")
-    #select_server.set("label", "Select server")
-
     index_i = 0
     for api in configJSON["servers"]: 
+        #get server 
+        server = api["server_url"]
+
         index_i += 1
+
         #check conformance
         with urllib.request.urlopen(api["server_url"] + "conformance") as conformanceURL:
+            #Retrieve conformance data
             conformanceData = json.load(conformanceURL)
             
+            #Set conformance to True
+            conformance = True
+
+            #Iterate over conformance classes
             for confClass in confClasses:
-                if confClass not in confClasses:
-                    msg = "Specified API available via:" + api + " does not conform to " + confClass + "." + "This may lead to issues when converting its processes to Galaxy tools."
+                #Ceck if conformance class is implemented
+                if confClass not in conformanceData["conformsTo"]:
+                    #Create warnning and set conformance to False if certain conformance class is not implemented
+                    msg = "Specified API available via:" + api["server_url"] + " does not conform to " + confClass + ". This may lead to issues when converting its processes to Galaxy tools."
                     warnings.warn(msg, Warning)
+                    conformance = False               
 
-        #server = ET.Element("option")
-        #server.text = api["server_url"]
-        #server.set("value", api["server_url"])
-        #select_server.append(server)
+            #Set help text for tool
+            if conformance:
+                help.text = configJSON["help"]
+            else:
+                #If API might not be complient with OGC processes API add notification to help text
+                help.text = configJSON["help"] + " Take note that the service provided by this does not implement all nesseracy OGC API Processes conformance classes and might thus not behave as expected!"
 
-        #make sure select-server dropdown is at the beginning
-        #if index_i == len(configJSON):
-        #    conditional_server.append(select_server)
-
-        #when_server = ET.Element("when")
-        #when_server.set("value", api["server_url"])
-
+        #Create process selectors
         conditional_process = ET.Element("conditional")
         conditional_process.set("name", "conditional_process")
         select_process = ET.Element("param")
@@ -143,9 +162,11 @@ def OGCAPIProcesses2Galaxy(configFile: str) -> None:
         select_process.set("label", "Select process")
 
         with urllib.request.urlopen(api["server_url"] + "processes" + api["filter"]) as processesURL:
+            #retrieve process data
             processesData = json.load(processesURL)
             
             when_list_processes = []
+            #Iterate over processes
             for process in processesData["processes"]: #only get 50 processes!
                 
                 #command information for process
@@ -158,9 +179,11 @@ def OGCAPIProcesses2Galaxy(configFile: str) -> None:
                 #check if process is included
                 if(process["id"] in api["included_services"] or ("*" in api["included_services"] and len(api["included_services"]) == 1)):
                     with urllib.request.urlopen(api["server_url"] + "processes/" + process["id"]) as processURL:
+                        #Retrieve process data
                         process = json.load(processURL)
                         processElement = ET.Element("option")
 
+                        #Set title
                         if("title" in process.keys()):
                             processElement.text = process["id"] + ": " + process["title"]
                         else:
@@ -181,19 +204,27 @@ def OGCAPIProcesses2Galaxy(configFile: str) -> None:
                             process_input = ET.Element("param")
 
                             #set param name
-                            process_input.set("name", param) 
+                            process_input.set("name", param.replace(".", "_")) 
                             
                             #set param title
                             if "title" in process["inputs"][param].keys():
-                                    process_input.set("label", process["inputs"][param]["title"])
+                                #process_input.set("label", param)
+                                process_input.set("label", process["inputs"][param]["title"])
                             else:
                                 process_input.set("label", param)
 
-                            if "nullable" in process["inputs"][param]["schema"].keys():
+                            #check if param is optional
+                            optional = False
+                            if "nullable" in process["inputs"][param]["schema"].keys():    
                                 if process["inputs"][param]["schema"]["nullable"]:
                                     process_input.set("optional", "true")
-                                else:
-                                    process_input.set("optional", "false")
+                                    optional = True
+                            if "minOccurs" in process["inputs"][param].keys():
+                                if process["inputs"][param]["minOccurs"] == 0:
+                                    process_input.set("optional", "true")
+                                    optional = True
+                            if optional == False:
+                                process_input.set("optional", "false")
 
                             #set default
                             if "default" in process["inputs"][param]["schema"].keys():
@@ -203,26 +234,33 @@ def OGCAPIProcesses2Galaxy(configFile: str) -> None:
                             if "description" in process["inputs"][param].keys():
                                 process_input.set("help", process["inputs"][param]["description"])
                             else:
-                                process_input.set("help", "No description provided!")
+                                process_input.set("help", "")
 
-                            #set param type
+                            #Retrive simple or extented schema
                             if("extended-schema" in process["inputs"][param].keys()):
                                 schema = process["inputs"][param]["extended-schema"]
                             else: 
                                 schema = process["inputs"][param]["schema"]
                             
-                            if 'oneOf' in schema.keys(): 
+                            #If multiple schemas are possible
+                            if ("oneOf" in schema.keys() and len(process["inputs"][param]["schema"]["oneOf"]) > 0): 
+                                #Use the first one 
+                                print(process["inputs"][param]["schema"]["oneOf"])
+                                print(process["inputs"][param])
                                 schema = process["inputs"][param]["schema"]["oneOf"][0]
-
+                            
+                            #Set param type
                             if 'type' in schema.keys(): #simple schema
                                 if schema["type"] in typeMapping.keys():
                                     process_input.set("type", typeMapping[schema["type"]])
                                     if "format" in schema.keys():
                                         if schema["format"] == "binary":
                                             process_input.set("type", "data")
+                                            process_input.set("format", "txt")
                                     if "contentMediaType" in schema.keys():
                                         if schema["contentMediaType"] in mediaTypes:
                                             process_input.set("type", "data")
+                                            process_input.set("format", "txt")
                                     if schema["type"] == "boolean":
                                         process_input.set("truevalue", "True") # Galaxy uses this for bools
                                         process_input.set("falsevalue", "False")
@@ -237,14 +275,18 @@ def OGCAPIProcesses2Galaxy(configFile: str) -> None:
                                     if schema["type"] == "array":
                                         if 'items' in schema.keys():
                                             if 'type' in schema["items"].keys():
-                                                #process_input.set("type", typeMapping[schema["items"]["type"]])
                                                 process_input.set("name", param +  "_Array_" + typeMapping[schema["items"]["type"]])
                                                 process_input.set("type", "text")
                                                 process_input.set("help", "Please provide comma-seperated values of type " + typeMapping[schema["items"]["type"]] + " here.")
-
+                                            elif 'oneOf' in schema["items"].keys():
+                                                for i in schema["items"]["oneOf"]:
+                                                    if 'type' in i.keys():
+                                                        if i["type"] == "object":
+                                                            process_input.set("type", "data")
+                                                            process_input.set("format", "txt")
                             when_process.append(process_input)
                         
-                        #add inputs to command information for process
+                        #Add inputs to command information for process
                         processCommand["inputs"] = inputCommand
                         
                         outputFormatCommands = []
@@ -273,39 +315,12 @@ def OGCAPIProcesses2Galaxy(configFile: str) -> None:
         conditional_process.append(select_process)
         for when_process in when_list_processes:
             conditional_process.append(when_process)    
-        #when_server.append(conditional_process)
-    #conditional_server.append(when_server)
 
     #add command
     commandText = "<![CDATA["
-    
-    #for i in range(0, len(commands)):
-        #if i == 0:
-            #commandText += "\n#if $conditional_server.select_process == \"" + commands[i]["process"] + "\":\n"
-            #commandText += "\n#if $select_process == \"" + commands[i]["process"] + "\":\n"
     commandText += "\n\tRscript '$__tool_directory__/generic.R'\n"
-            #commandText += "\t\t--server '$select_server' \n"
-            #commandText += "\t\t--server " + api["server_url"] + "\n"
-            #commandText += "\t\t--process '$select_process'"
-            #for y in commands[i]["inputs"]:
-            #    commandText += "\n\t\t--"+ y + " \'${" + y.replace(".", "_") + "}\'"
-            #for o in commands[i]["outputs"]:
-            #    commandText += "\n\t\t--"+ o + " \'${" + o.replace(".", "_") + "}\'"
-            #commandText += "\t\t--inputs '$inputs'"
+    commandText += "\t\t--server '" + server + "'\n"
     commandText += "\t\t--outputData '$output_data'"
-        #else:
-            #commandText += "\n#elif $conditional_server.select_process == \"" + commands[i]["process"] + "\":\n"
-            #commandText += "\n#elif $select_process == \"" + commands[i]["process"] + "\":\n"
-            #commandText += "\tRscript '$__tool_directory__/generic.R'\n"
-            #commandText += "\t\t--server '$select_server' \n"
-            #commandText += "\t\t--server " + api["server_url"] + "\n"
-            #commandText += "\t\t--process '$select_process'"
-            #for y in commands[i]["inputs"]:
-            #    commandText += "\n\t\t--"+ y + " \'${" + y.replace(".", "_") + "}\'"
-            #for o in commands[i]["outputs"]:
-            #    commandText += "\n\t\t--"+ o + " \'${" + o.replace(".", "_") + "}\'"
-            #commandText += "\t\t--inputs '$inputs'"
-            #commandText += "\n\t\t--outputData '$output_data'"
     commandText += "\n]]>"
     command.text = commandText
     tool.append(command)
@@ -320,7 +335,6 @@ def OGCAPIProcesses2Galaxy(configFile: str) -> None:
     tool.append(configfiles)
 
     #add inputs 
-    #inputs.append(conditional_server)
     inputs.append(conditional_process)
     tool.append(inputs)
 
@@ -330,9 +344,6 @@ def OGCAPIProcesses2Galaxy(configFile: str) -> None:
     dataOutput.set("name", "output_data")
     dataOutput.set("format", "txt")
     dataOutput.set("label", "$select_process")
-    #discover_datasets = ET.Element("discover_datasets")
-    #discover_datasets.set("pattern", "__name_and_ext__")
-    #collection.append(discover_datasets)
     outputs.append(dataOutput)
     tool.append(outputs)
 
@@ -341,16 +352,19 @@ def OGCAPIProcesses2Galaxy(configFile: str) -> None:
     tests.set("macro", "tests")
     tool.append(tests)
 
-    #add help
-    help = ET.Element("expand")
-    help.set("macro", "help")
     tool.append(help)
+
+    #add help
+    #help = ET.Element("expand")
+    #help.set("macro", "help")
+    #tool.append(help)
 
     #add citation
     citations = ET.Element("expand")
     citations.set("macro", "citations")
     tool.append(citations)
 
+    #Export .xml file
     with open ("generic.xml", "wb") as toolFile: 
         toolString = ET.tostring(tool, encoding='unicode')
         toolString = toolString.replace("&lt;", "<")

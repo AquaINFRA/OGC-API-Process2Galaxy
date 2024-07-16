@@ -7,7 +7,9 @@
             "excluded_services": []
         }
     ],
-    "id":"zoo_project_ogc_api_processes",
-    "title":"Zoo Project OGC API Processes",
-    "version":"0.1.0"
+    "id":"hirondelle_crim",
+    "title":"Hirondelle CRIM OGC API Processes",
+    "version":"0.1.0",
+    "description": "Some description text.",
+    "help": "Some help text."
 }
