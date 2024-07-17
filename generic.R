@@ -9,7 +9,7 @@ getParameters <- function(){
     line <- readLines(con, n = 1)
     json <- fromJSON(line)
     close(con)
-    return(json$conditional_process)
+    return(json)
 }
 
 parseResponseBody <- function(body) {
@@ -21,8 +21,8 @@ parseResponseBody <- function(body) {
   return(jsonObject)
 }
 
-getOutputs <- function(inputs, output, server) {
-    url <- paste(paste(server, "/processes/", sep = ""), inputs$select_process, sep = "")
+getOutputs <- function(inputs, output, server, process) {
+    url <- paste(paste(server, "processes/", sep = ""), process, sep = "")
     request <- request(url)
     response <- req_perform(request)
     responseBody <- parseResponseBody(response$body)
@@ -48,20 +48,33 @@ getOutputs <- function(inputs, output, server) {
 
 executeProcess <- function(url, process, requestBodyData, output) {
     url <- paste(paste(paste(url, "processes/", sep = ""), process, sep = ""), "/execution", sep = "")
+    cookie <- requestBodyData$inputs$cookie
+    requestBodyData$inputs$cookie <- NULL
+    print("hallo1")
+    print(requestBodyData)
+    print(cookie)
+    print("hallo2")
     response <- request(url) %>%
     req_headers(
-      "accept" = "/*",
-      "Prefer" = "respond-async;return=representation",
-      "Content-Type" = "application/json"
+      #"User-Agent" = "python-requests/2.31.0", 
+      #"Accept-Encoding" = "gzip, deflate, br", 
+      #"Accept" = "*/*", 
+      #"Connection" = "keep-alive", 
+      "Prefer" = "respond-async",
+      "Authorization" = cookie
+      #"Content-Length" = "196",
+      #"Content-Type" = "application/json"
     ) %>%
     req_body_json(requestBodyData) %>%
     req_perform()
 
     cat("\n Process executed")
     cat("\n status: ", response$status_code)
-    cat("\n jobID: ", parseResponseBody(response$body)$jobID, "\n")
-
-    jobID <- parseResponseBody(response$body)$jobID
+    cat("\n jobID: ", parseResponseBody(response$body), "\n")
+    
+    job_location <- response |> resp_headers("location")
+    jobID <- sub(".*\\/([a-z0-9\\-]+)$", "\\1", job_location$location)
+    #jobID <- parseResponseBody(response$body)$jobID
 
     return(jobID)
 }
@@ -72,10 +85,11 @@ checkJobStatus <- function(server, jobID) {
         'accept' = 'application/json'
     ) %>%
     req_perform()
-  jobStatus <- parseResponseBody(response$body)$status
-  jobProgress <- parseResponseBody(response$body)$progress
+  jobResponse <- parseResponseBody(response$body) 
+  jobStatus <- jobResponse$status
+  jobProgress <- jobResponse$progress
   cat(paste0("\n status: ", jobStatus, ", progress: ", jobProgress))
-  return(jobStatus)
+  return(jobResponse)
 }
 
 getStatusCode <- function(server, jobID) {
@@ -89,6 +103,8 @@ getStatusCode <- function(server, jobID) {
 }
 
 getResult <- function (server, jobID) {
+  print("start getting result")
+  print(paste0(server, "jobs/", jobID, "/results"))
   response <- request(paste0(server, "jobs/", jobID, "/results")) %>%
     req_headers(
       'accept' = 'application/json'
@@ -99,26 +115,41 @@ getResult <- function (server, jobID) {
 
 retrieveResults <- function(server, jobID, outputData) {
     status_code <- getStatusCode(server, jobID)
+    print(status_code)
     if(status_code == 200){
         status <- "running"
         cat(status)
         while(status == "running"){
-            jobStatus <- checkJobStatus(server, jobID)
+            jobRes <- checkJobStatus(server, jobID)
+            jobStatus <- jobRes$status
             if (jobStatus == "successful") {
                 status <- jobStatus
-                result <- getResult(server, jobID)
-                if (result$status_code == 200) {
-                  resultBody <- parseResponseBody(result$body)
-                  urls <- unname(unlist(lapply(resultBody, function(x) x$href)))
-                  urls_with_newline <- paste(urls, collapse = "\n")
-                  con <- file(outputData, "w")
-                  writeLines(urls_with_newline, con = con)
-                  close(con)
-                }
+                #result <- getResult(server, jobID)
+                #if (result$status_code == 200) {
+                #  resultBody <- parseResponseBody(result$body)
+                #  urls <- unname(unlist(lapply(resultBody, function(x) x$href)))
+                #  urls_with_newline <- paste(urls, collapse = "\n")
+                con <- file(outputData, "w")
+                print("----------------")
+                print(jobRes)
+                print("----------------")
+                print(jobRes$links)
+                print("----------------")
+                print(jobRes$links[3])
+                print("----------------")
+                print(jobRes$links[3]$href)
+                print("----------------")
+                print(jobRes$links$href)
+                print("----------------")
+                print(jobRes$links$href[3])
+                print("----------------")
+                writeLines(jobRes$links$href[3], con = con)
+                close(con)
+                #}
             } else if (jobStatus == "failed") {
               status <- jobStatus
             }
-        Sys.sleep(3)
+        Sys.sleep(10)
         }
         cat("\n done \n")
     } else if (status_code1 == 400) {
@@ -138,7 +169,6 @@ is_url <- function(x) {
 
 print("--> Retrieve parameters")
 inputParameters <- getParameters()
-print(inputParameters)
 print("--> Parameters retrieved")
 
 args <- commandArgs(trailingOnly = TRUE)
@@ -148,7 +178,8 @@ server <- args[2]
 outputLocation <- args[4]
 
 print("--> Retrieve outputs")
-outputs <- getOutputs(inputParameters, outputLocation, server)
+process <- "water-quality-eo-app-pkg"
+outputs <- getOutputs(inputParameters, outputLocation, server, process)
 print("--> Outputs retrieved")
 
 print("--> Parse inputs")
@@ -211,7 +242,7 @@ jsonData <- list(
 )
 
 print("--> Execute process")
-jobID <- executeProcess(server, inputParameters$select_process, jsonData, outputLocation)
+jobID <- executeProcess(server, process, jsonData, outputLocation)
 print("--> Process executed")
 
 print("--> Retrieve results")

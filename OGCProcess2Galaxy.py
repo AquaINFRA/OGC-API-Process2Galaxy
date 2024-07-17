@@ -234,7 +234,10 @@ def OGCAPIProcesses2Galaxy(configFile: str) -> None:
                             if "description" in process["inputs"][param].keys():
                                 process_input.set("help", process["inputs"][param]["description"])
                             else:
-                                process_input.set("help", "")
+                                if "Description" in process["inputs"][param].keys():
+                                    process_input.set("help", process["inputs"][param]["Description"])
+                                else:
+                                    process_input.set("help", "")
 
                             #Retrive simple or extented schema
                             if("extended-schema" in process["inputs"][param].keys()):

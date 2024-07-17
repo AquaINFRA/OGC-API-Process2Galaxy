@@ -1,0 +1,17 @@
+{
+    "servers":
+    [
+        {
+            "server_url": "https://processing.terrabyte.lrz.de/",
+            "included_services": ["*"],
+            "filter": "",
+            "excluded_services": ["hello-world", "water-quality"
+            ]
+        }
+    ],
+    "id":"terrabyte_ogc_api_processes",
+    "title":"Terrabyte OGC API Processes",
+    "version":"0.1.0",
+    "description": "provide a processing API for geospatial data",
+    "help": "This tool is a wrapper for OGC API Processes coming from the terrabyte processing API (https://processing.terrabyte.lrz.de/)."
+}
