@@ -1,19 +1,20 @@
 <tool id="terrabyte_ogc_api_processes" name="Terrabyte OGC API Processes" version="0.1.0">
 	<description>Water quality EO Application Package</description>
-	<macros>
-		<import>macros.xml</import>
-	</macros>
-	<expand macro="requirements"/>
+	<requirements>
+		<requirement type="package" version="4.3.1">r-base</requirement>
+		<requirement type="package" version="1.20.4">r-getopt</requirement>
+		<requirement type="package" version="0.2.3">r-httr2</requirement>
+		<requirement type="package" version="1.8.7">r-jsonlite</requirement>
+	</requirements>
 	<command detect_errors="exit_code"><![CDATA[
 	Rscript '$__tool_directory__/generic.R'
-		--server 'https://processing.terrabyte.lrz.de/'
 		--outputData '$output_data'
 ]]></command>
 	<configfiles>
 		<inputs name="inputs" filename="inputs.json" data_style="paths"/>
 	</configfiles>
 	<inputs>
-		<param name="cookie" label="cookie" optional="false" value="" type="text"/>
+		<param name="cookie" label="Cookie" optional="false" value="" type="text" help="See 'Help' for for more information regarding the cookie."/>
 		<param name="date" label="Date" optional="false" help="Center date for data query" type="text"/>
 		<param name="delta" label="Delta" optional="false" help="Days delta +- around the specified date" type="text"/>
 		<param name="aoi" label="AOI" optional="false" help="Area of interest as GeoJSON polygon to find intersection of products" type="text"/>
@@ -22,7 +23,21 @@
 	<outputs>
 		<data name="output_data" format="txt" label="Water quality EO Application Package"/>
 	</outputs>
-	<expand macro="tests"/>
-	<help>This process takes a Sentinel-2 Scene as input, and calculates chlorophyll-a concentration and turbidity in water bodies in an EO Application Package.It returns the results as tiffs representing the input scene. You need to have an account at the Leibniz Supercomputing Center (LRZ) with a grant for terrabyte. As part of the OGC Open Science Persistent Demonstrator you can asked for an account at LRZ/terrabyte. If you are associated with an educational organisation, you can likely create an account with your account using the eduGAIN federation. Please have a look at our documentation: https://docs.terrabyte.lrz.de/services/identity/get-account/.</help>
-	<expand macro="citations"/>
+	<tests>
+		<test expect_failure="true">
+			<param name="cookie" value=""/>
+			<param name="date" value="2019-06-29"/>
+			<param name="delta" value="4"/>
+			<param name="aoi" value="POLYGON ((-7.664532 38.543869, -7.689248 38.141037, -7.159228 38.151837, -7.115289 38.554609, -7.664532 38.543869))"/>
+			<param name="cloud_cover" value="0.1"/>
+			<assert_stderr>
+				<has_text text="HTTP 401 Unauthorized"/>
+			</assert_stderr>
+		</test>
+	</tests>
+	<help>This process takes a Sentinel-2 Scene as input, and calculates chlorophyll-a concentration and turbidity in water bodies in an EO Application Package. It returns the results as tiffs representing the input scene. You need to have an account at the Leibniz Supercomputing Center (LRZ) with a grant for terrabyte. As part of the OGC Open Science Persistent Demonstrator you can ask for an account at LRZ/terrabyte. If you are associated with an educational organisation, you can likely create an account with your account using the eduGAIN federation. Please have a look at our documentation: https://docs.terrabyte.lrz.de/services/identity/get-account/.</help>
+	<citations>
+		<citation type="bibtex">@Manual{httr2, title = {httr2: Perform HTTP Requests and Process the Responses}, author = {Hadley Wickham}, year = {2023}, note = {R package version 1.0.0, https://github.com/r-lib/httr2}, url = {https://httr2.r-lib.org},}</citation>
+		<citation type="doi">10.48550/arXiv.1403.2805</citation>
+	</citations>
 </tool>

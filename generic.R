@@ -50,20 +50,10 @@ executeProcess <- function(url, process, requestBodyData, output) {
     url <- paste(paste(paste(url, "processes/", sep = ""), process, sep = ""), "/execution", sep = "")
     cookie <- requestBodyData$inputs$cookie
     requestBodyData$inputs$cookie <- NULL
-    print("hallo1")
-    print(requestBodyData)
-    print(cookie)
-    print("hallo2")
     response <- request(url) %>%
     req_headers(
-      #"User-Agent" = "python-requests/2.31.0", 
-      #"Accept-Encoding" = "gzip, deflate, br", 
-      #"Accept" = "*/*", 
-      #"Connection" = "keep-alive", 
       "Prefer" = "respond-async",
       "Authorization" = cookie
-      #"Content-Length" = "196",
-      #"Content-Type" = "application/json"
     ) %>%
     req_body_json(requestBodyData) %>%
     req_perform()
@@ -74,7 +64,6 @@ executeProcess <- function(url, process, requestBodyData, output) {
     
     job_location <- response |> resp_headers("location")
     jobID <- sub(".*\\/([a-z0-9\\-]+)$", "\\1", job_location$location)
-    #jobID <- parseResponseBody(response$body)$jobID
 
     return(jobID)
 }
@@ -102,66 +91,52 @@ getStatusCode <- function(server, jobID) {
   return(response$status_code)
 }
 
-getResult <- function (server, jobID) {
+getResult <- function (server) {
   print("start getting result")
-  print(paste0(server, "jobs/", jobID, "/results"))
-  response <- request(paste0(server, "jobs/", jobID, "/results")) %>%
+  print(server)
+  response <- request(server) %>%
     req_headers(
       'accept' = 'application/json'
     ) %>%
     req_perform()
-  return(response)
+  res <- parseResponseBody(response$body)
+  return(res)
 }
 
 retrieveResults <- function(server, jobID, outputData) {
-    status_code <- getStatusCode(server, jobID)
-    print(status_code)
-    if(status_code == 200){
-        status <- "running"
-        cat(status)
-        while(status == "running"){
-            jobRes <- checkJobStatus(server, jobID)
-            jobStatus <- jobRes$status
-            if (jobStatus == "successful") {
-                status <- jobStatus
-                #result <- getResult(server, jobID)
-                #if (result$status_code == 200) {
-                #  resultBody <- parseResponseBody(result$body)
-                #  urls <- unname(unlist(lapply(resultBody, function(x) x$href)))
-                #  urls_with_newline <- paste(urls, collapse = "\n")
-                con <- file(outputData, "w")
-                print("----------------")
-                print(jobRes)
-                print("----------------")
-                print(jobRes$links)
-                print("----------------")
-                print(jobRes$links[3])
-                print("----------------")
-                print(jobRes$links[3]$href)
-                print("----------------")
-                print(jobRes$links$href)
-                print("----------------")
-                print(jobRes$links$href[3])
-                print("----------------")
-                writeLines(jobRes$links$href[3], con = con)
-                close(con)
-                #}
-            } else if (jobStatus == "failed") {
-              status <- jobStatus
-            }
-        Sys.sleep(10)
-        }
-        cat("\n done \n")
-    } else if (status_code1 == 400) {
+  status_code <- getStatusCode(server, jobID)
+  print(status_code)
+  if (status_code == 200) {
+    status <- "running"
+    cat(status)
+    while (status == "running") {
+      job_res <- checkJobStatus(server, jobID)
+      job_status <- job_res$status
+      if (job_status == "successful") {
+        status <- job_status
+        result <- getResult(job_res$links$href[2])
+        urls <- unname(unlist(result))
+        con <- file(outputData, "w")
+        print(outputData)
+        writeLines(urls, con = con)
+        close(con)
+      } else if (job_status == "failed") {
+        status <- job_status
+      }
+      Sys.sleep(10)
+    }
+    cat("\n done \n")
+  } else if (status_code == 400) {
     print("A query parameter has an invalid value.")
-  } else if (status_code1 == 404) {
+  } else if (status_code == 404) {
     print("The requested URI was not found.")
-  } else if (status_code1 == 500) {
+  } else if (status_code == 500) {
     print("The requested URI was not found.")
   } else {
-    print(paste("HTTP", status_code1, "Error:", resp1$status_message))
+    print(paste("HTTP", status_code, "Error:", job_res$status_message))
   }
 }
+
 
 is_url <- function(x) {
   grepl("^https?://", x)
@@ -172,13 +147,11 @@ inputParameters <- getParameters()
 print("--> Parameters retrieved")
 
 args <- commandArgs(trailingOnly = TRUE)
-
-server <- args[2]
-
-outputLocation <- args[4]
+server <- "https://processing.terrabyte.lrz.de/"
+process <- "water-quality-eo-app-pkg"
+outputLocation <- args[2]
 
 print("--> Retrieve outputs")
-process <- "water-quality-eo-app-pkg"
 outputs <- getOutputs(inputParameters, outputLocation, server, process)
 print("--> Outputs retrieved")
 
