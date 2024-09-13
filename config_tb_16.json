@@ -4,12 +4,27 @@
             "server_url": "https://hirondelle.crim.ca/weaver/",
             "included_services": ["*"],
             "filter": "",
-            "excluded_services": []
+            "excluded_services": ["algae-usecase-workflow-copernicus", 
+                "algae-usecase-workflow-copernicus-process", 
+                "algae-usecase-workflow-earth-search", 
+                "algae-usecase-workflow-earth-search-process", 
+                "download-band-sentinel2-stac-item",
+                "EchoProcess",
+                "file_index_selector",
+                "file2string_array",
+                "jsonarray2netcdf",
+                "metalink2netcdf",
+                "ogc-tb16-land-cover-mapping"
+            ],
+            "excluded_inputs": ["s3_access_key", "s3_secret_key"],
+            "login": {
+                "type": "cookie"
+            }
         }
     ],
     "id":"hirondelle_crim",
     "title":"Hirondelle CRIM OGC API Processes",
-    "version":"0.1.0",
+    "version":"0.2.0",
     "description": "Some description text.",
     "help": "Some help text."
 }
