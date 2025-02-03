@@ -1,6 +1,7 @@
 <?xml version="1.0" ?>
 <tool id="aquainfra_ogc_api_processes" name="AquaINFRA OGC API Processes" version="0.3.0" profile="22.05">
 	<description/>
+	<help>Use the dropdown menu at the top to select the OGC API processes hosted on https://aquainfra.ogc.igb-berlin.de/pygeoapi/ and then complete the corresponding form to run the service.</help>
 	<macros>
 		<import>macros.xml</import>
 	</macros>
@@ -130,6 +131,5 @@
 		<data name="output_data" format="txt" label="$select_process"/>
 	</outputs>
 	<expand macro="tests"/>
-	<help>Use the dropdown menu at the top to select the OGC API processes hosted on https://aquainfra.ogc.igb-berlin.de/pygeoapi/ and then complete the corresponding form to run the service.</help>
 	<expand macro="citations"/>
 </tool>
