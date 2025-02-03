@@ -92,6 +92,7 @@ def OGCAPIProcesses2Galaxy(configFile: str) -> None:
     tool.set('id', configJSON["id"])
     tool.set('name', configJSON["title"])
     tool.set('version', configJSON["version"])
+    tool.set('profile', configJSON["profile"])
 
     #add description
     description = ET.Element("description")
@@ -109,6 +110,14 @@ def OGCAPIProcesses2Galaxy(configFile: str) -> None:
     macros.append(importMacro)
     tool.append(macros)
 
+    #add creator
+    creator = ET.Element("creator")
+    organization = ET.Element("organization")
+    organization.set('name', configJSON["creator"]["name"])
+    organization.set('url', configJSON["creator"]["url"])
+    creator.append(organization)
+    tool.append(creator)
+
     #add requirements
     requirements = ET.Element("expand")
     requirements.set("macro", "requirements")
@@ -125,7 +134,7 @@ def OGCAPIProcesses2Galaxy(configFile: str) -> None:
     index_i = 0
     for api in configJSON["servers"]: 
         #get server 
-        server = api["server_url"]
+        #server = api["server_url"]
 
         index_i += 1
 
@@ -185,7 +194,7 @@ def OGCAPIProcesses2Galaxy(configFile: str) -> None:
 
                         #Set title
                         if("title" in process.keys()):
-                            processElement.text = process["id"] + ": " + process["title"]
+                            processElement.text = process["id"] + ": " + process["title"].strip()
                         else:
                             processElement.text = process["id"]  
 
@@ -232,6 +241,7 @@ def OGCAPIProcesses2Galaxy(configFile: str) -> None:
                             
                             #set param description
                             if "description" in process["inputs"][param].keys():
+                                process["inputs"][param]["description"] = process["inputs"][param]["description"].replace('"', "'")
                                 process_input.set("help", process["inputs"][param]["description"])
                             else:
                                 process_input.set("help", "")
@@ -245,15 +255,21 @@ def OGCAPIProcesses2Galaxy(configFile: str) -> None:
                             #If multiple schemas are possible
                             if ("oneOf" in schema.keys() and len(process["inputs"][param]["schema"]["oneOf"]) > 0): 
                                 #Use the first one 
-                                print(process["inputs"][param]["schema"]["oneOf"])
-                                print(process["inputs"][param])
+                                #print(process["inputs"][param]["schema"]["oneOf"])
+                                #print(process["inputs"][param])
                                 schema = process["inputs"][param]["schema"]["oneOf"][0]
                             
                             #Set param type
                             if 'type' in schema.keys(): #simple schema
                                 if schema["type"] in typeMapping.keys():
                                     process_input.set("type", typeMapping[schema["type"]])
+                                    for input in configJSON["input_data_params"]:
+                                        if process["id"] == input["process"] and param == input["param_name"]:
+                                            process_input.set("type", "data")
+                                            process_input.set("format", "txt")
+                                            process_input.set("help", process["inputs"][param]["description"] + " (URL must be stored in a .txt file)")
                                     if "format" in schema.keys():
+                                        print(schema["format"])
                                         if schema["format"] == "binary":
                                             process_input.set("type", "data")
                                             process_input.set("format", "txt")
@@ -272,6 +288,12 @@ def OGCAPIProcesses2Galaxy(configFile: str) -> None:
                                             option.set("value", enum)
                                             option.text = enum
                                             process_input.append(option)
+                                    if "minimum" in schema:
+                                        min = schema["minimum"]
+                                        process_input.set("min", str(min))
+                                    if "maximum" in schema:
+                                        max = schema["maximum"]
+                                        process_input.set("max", str(max))
                                     if schema["type"] == "array":
                                         if 'items' in schema.keys():
                                             if 'type' in schema["items"].keys():
@@ -318,10 +340,10 @@ def OGCAPIProcesses2Galaxy(configFile: str) -> None:
 
     #add command
     commandText = "<![CDATA["
-    commandText += "\n\tRscript '$__tool_directory__/generic.R'\n"
-    commandText += "\t\t--server '" + server + "'\n"
+    commandText += "\n\tRscript '$__tool_directory__/" + configJSON["script"] + "'\n"
+    #commandText += "\t\t--server '" + server + "'\n"
     commandText += "\t\t--outputData '$output_data'"
-    commandText += "\n]]>"
+    commandText += "\n    ]]>"
     command.text = commandText
     tool.append(command)
 

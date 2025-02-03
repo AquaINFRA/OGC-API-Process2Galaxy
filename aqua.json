@@ -1,0 +1,71 @@
+{
+    "servers":[
+        {
+            "server_url": "https://aquainfra.ogc.igb-berlin.de/pygeoapi/",
+            "included_services": ["*"],
+            "filter": "",
+            "excluded_services": ["hello-world"]
+        }
+    ],
+    "id":"aquainfra_ogc_api_processes",
+    "title":"AquaINFRA OGC API Processes",
+    "version":"0.3.0",
+    "profile":"22.05",
+    "description": "",
+    "help": "Use the dropdown menu at the top to select the OGC API processes hosted on https://aquainfra.ogc.igb-berlin.de/pygeoapi/ and then complete the corresponding form to run the service.",
+    "creator": {
+        "name": "EOSC AquaINFRA",
+        "url": "https://aquainfra.eu/"
+    },
+    "script": "aquainfra_ogc_api_processes.R",
+    "input_data_params": [
+        {
+            "process": "points-att-polygon",
+            "param_name": "input_data"
+        },
+        {
+            "process": "points-att-polygon",
+            "param_name": "regions"
+        },
+        {
+            "process": "peri-conv",
+            "param_name": "input_data"
+        },
+        {
+            "process": "mean-by-group",
+            "param_name": "input_data"
+        },
+        {
+            "process": "ts-selection-interpolation",
+            "param_name": "input_data"
+        },
+        {
+            "process": "trend-analysis-mk",
+            "param_name": "input_data"
+        },
+        {
+            "process": "barplot-trend-results",
+            "param_name": "input_data"
+        },
+        {
+            "process": "map-trends-static",
+            "param_name": "input_data"
+        },
+        {
+            "process": "map-trends-static",
+            "param_name": "regions"
+        },
+        {
+            "process": "map-shapefile-points",
+            "param_name": "input_data"
+        },
+        {
+            "process": "map-shapefile-points",
+            "param_name": "regions"
+        },
+        {
+            "process": "owt-classification",
+            "param_name": "input_data_url"
+        }
+    ]
+}

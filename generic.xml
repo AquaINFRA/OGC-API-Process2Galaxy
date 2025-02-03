@@ -1,110 +1,128 @@
 <?xml version="1.0" ?>
-<tool id="hirondelle_crim" name="Hirondelle CRIM OGC API Processes" version="0.2.0">
-	<description>Some description text.</description>
+<tool id="aquainfra_ogc_api_processes" name="AquaINFRA OGC API Processes" version="0.3.0" profile="22.05">
+	<description/>
 	<macros>
 		<import>macros.xml</import>
 	</macros>
+	<creator>
+		<organization name="EOSC AquaINFRA" url="https://aquainfra.eu/"/>
+	</creator>
 	<expand macro="requirements"/>
 	<command detect_errors="exit_code"><![CDATA[
-	Rscript '$__tool_directory__/generic.R'
-		--server 'https://hirondelle.crim.ca/weaver/'
+	Rscript '$__tool_directory__/aquainfra_ogc_api_processes.R'
 		--outputData '$output_data'
-]]></command>
+    ]]></command>
 	<configfiles>
 		<inputs name="inputs" filename="inputs.json" data_style="paths"/>
 	</configfiles>
 	<inputs>
 		<conditional name="conditional_process">
 			<param name="select_process" type="select" label="Select process">
-				<option value="calculate-band">calculate-band: Performs a calculation with bands.</option>
-				<option value="download-band-sentinel2-product-safe">download-band-sentinel2-product-safe: Downloads Copernicus products.</option>
-				<option value="plot-image">plot-image: Plots an image with colors.</option>
-				<option value="reproject-image">reproject-image: Performs image reprojection.</option>
-				<option value="select-products-sentinel2">select-products-sentinel2: Searches the specified catalog for Sentinel-2 products matching filtering criteria.</option>
+				<option value="points-att-polygon">points-att-polygon: Group points by region</option>
+				<option value="peri-conv">peri-conv: Group data to groups based on date</option>
+				<option value="mean-by-group">mean-by-group: Return group average</option>
+				<option value="ts-selection-interpolation">ts-selection-interpolation: Select and Interpolate Time Series</option>
+				<option value="trend-analysis-mk">trend-analysis-mk: Man-Kendall Trend Analysis on Time Series</option>
+				<option value="barplot-trend-results">barplot-trend-results: Visualisation of statistical analysis results</option>
+				<option value="map-trends-static">map-trends-static: Spatial visualisation of regions and data points</option>
+				<option value="map-shapefile-points">map-shapefile-points: Spatial visualisation of regions and data points</option>
+				<option value="owt-classification">owt-classification: OWT Classification</option>
 			</param>
-			<when value="calculate-band">
-				<param name="name" label="Output file name" optional="false" help="Name to apply for the output GeoTiff file." type="text"/>
-				<param name="calc" label="Calculation" optional="false" help="Calculation to perform with band references." type="text"/>
-				<param name="band_a" label="band_a" optional="true" help="" type="text"/>
-				<param name="band_b" label="band_b" optional="true" help="" type="text"/>
-				<param name="band_c" label="band_c" optional="true" help="" type="text"/>
-				<param name="band_d" label="band_d" optional="true" help="" type="text"/>
-				<param name="band_e" label="band_e" optional="true" help="" type="text"/>
-				<param name="band_f" label="band_f" optional="true" help="" type="text"/>
-				<param name="band_g" label="band_g" optional="true" help="" type="text"/>
-				<param name="band_h" label="band_h" optional="true" help="" type="text"/>
-				<param name="band_i" label="band_i" optional="true" help="" type="text"/>
-				<param name="band_j" label="band_j" optional="true" help="" type="text"/>
-				<param name="band_k" label="band_k" optional="true" help="" type="text"/>
-				<param name="band_l" label="band_l" optional="true" help="" type="text"/>
-				<param name="band_m" label="band_m" optional="true" help="" type="text"/>
-				<param name="band_n" label="band_n" optional="true" help="" type="text"/>
-				<param name="band_o" label="band_o" optional="true" help="" type="text"/>
-				<param name="band_p" label="band_p" optional="true" help="" type="text"/>
-				<param name="band_q" label="band_q" optional="true" help="" type="text"/>
-				<param name="band_r" label="band_r" optional="true" help="" type="text"/>
-				<param name="band_s" label="band_s" optional="true" help="" type="text"/>
-				<param name="band_t" label="band_t" optional="true" help="" type="text"/>
-				<param name="band_u" label="band_u" optional="true" help="" type="text"/>
-				<param name="band_v" label="band_v" optional="true" help="" type="text"/>
-				<param name="band_w" label="band_w" optional="true" help="" type="text"/>
-				<param name="band_x" label="band_x" optional="true" help="" type="text"/>
-				<param name="band_y" label="band_y" optional="true" help="" type="text"/>
-				<param name="band_z" label="band_z" optional="true" help="" type="text"/>
+			<when value="points-att-polygon">
+				<param name="input_data" label="Table to be merged with study region" optional="false" help="URL to the input table containing the in-situ data points with coordinates. Can be provided as Excel file or CSV file (comma-separated text file). The coordinates have to be in WGS84 coordinate system. (URL must be stored in a .txt file)" type="data" format="txt"/>
+				<param name="regions" label="Study region or study subregions" optional="false" help="URL to the study region, or several regions, to classify your input data into groups of interest. Currently it has to be provided as a shapefile. It can be in any coordinate system and will be transformed to WGS84 during this process. (URL must be stored in a .txt file)" type="data" format="txt"/>
+				<param name="colname_long" label="Column name for longitude" optional="true" help="Only needed for data other than geojson. Name of the column that contains longitude values (in WGS84)." type="text"/>
+				<param name="colname_lat" label="Column name for latiitude" optional="true" help="Only needed for data other than geojson. Name of the column that contains latitude values (in WGS84)." type="text"/>
 			</when>
-			<when value="download-band-sentinel2-product-safe">
-				<param name="product_url" label="S3 URL to a Sentinel-2 product in SAFE format." optional="false" help="" type="text"/>
-				<param name="s3_access_key" label="S3 access key required to retrieve products hosted on a protected S3 location." optional="false" help="Access key to Copernicus data provider. See https://documentation.dataspace.copernicus.eu/Registration.html and https://documentation.dataspace.copernicus.eu/APIs/S3.html#generate-secrets for details." type="text"/>
-				<param name="s3_secret_key" label="S3 secret key required to retrieve products hosted on a protected S3 location." optional="false" help="Secret key to Copernicus data provider. See https://documentation.dataspace.copernicus.eu/Registration.html and https://documentation.dataspace.copernicus.eu/APIs/S3.html#generate-secrets for details." type="text"/>
-				<param name="resolution_Array_text" label="resolution" optional="true" help="Please provide comma-seperated values of type text here." type="text"/>
-				<param name="band" label="band" optional="false" help="" type="select">
-					<option value="B01">B01</option>
-					<option value="B02">B02</option>
-					<option value="B03">B03</option>
-					<option value="B04">B04</option>
-					<option value="B05">B05</option>
-					<option value="B06">B06</option>
-					<option value="B07">B07</option>
-					<option value="B08">B08</option>
-					<option value="B8A">B8A</option>
-					<option value="B09">B09</option>
-					<option value="B11">B11</option>
-					<option value="B12">B12</option>
-					<option value="AOT">AOT</option>
-					<option value="SCL">SCL</option>
-					<option value="TCI">TCI</option>
-					<option value="WVP">WVP</option>
+			<when value="peri-conv">
+				<param name="input_data" label="Table to be grouped by date, with date colum" optional="false" help="URL to the table with a column containing a date. It can have other columns which will not be changed during this process. (URL must be stored in a .txt file)" type="data" format="txt"/>
+				<param name="colname_date" label="Date column name" optional="false" help="Column name of the date column in the format defined above. Example: 'visit_date'." type="text"/>
+				<param name="date_format" label="Date format" optional="true" value="y-m-d" help="The date format used to parse the date, i.e. to extract day, month and year from the date column, e.g.  or 'y-m-d' for dates like '1998-08-22' (this is the default) or 'y/m/d' for dates like '1998/08/22'." type="select">
+					<option value="y-m-d">y-m-d</option>
+					<option value="y/m/d">y/m/d</option>
 				</param>
-				<param name="debug_Array_boolean" label="debug" optional="true" help="Please provide comma-seperated values of type boolean here." type="text"/>
+				<param name="group_to_periods" label="Periods to group the data into" optional="true" value="Dec-01:Mar-01,Mar-02:May-30,Jun-01:Aug-30,Sep-01:Nov-30" help="Define the periods that you want the data to be grouped into. Please follow the example (which is also the default): 'Dec-01:Mar-01,Mar-02:May-30,Jun-01:Aug-30,Sep-01:Nov-30' (first three letters of each month, then a minus/hyphen, then the day (two digits), then comma, then the next period)." type="text"/>
+				<param name="period_labels" label="Period labels" optional="true" value="winter,spring,summer,autumn" help="Define names for the periods defined above, separated by a comma. Example (which is also the default): 'winter,spring,summer,autumn'." type="text"/>
+				<param name="year_starts_at_dec1" label="Include December into next year" optional="true" value="True" help="Tell whether the years in your grouping starts at first of December ('true') or not ('false'). This has to be reflected in the period definitions, these should not contradict each other. Defaults to 'true'." type="boolean" truevalue="True" falsevalue="False"/>
 			</when>
-			<when value="plot-image">
-				<param name="input_image" label="input_image" optional="false" help="Image to map with the colors bins." type="data" format="txt"/>
-				<param name="color_scale" label="Color mappings to bin scales to apply to the image." optional="false" help="JSON-like array with each item being an array of 2 elements, the first for the bin scale value and the second for the RGB color. Each RGB value can be either a [0-1] floating point or a [0-255] integer. Example: '[ [0, [0,0,0]], [20, [0,0,255]], [50, [255,100,0]] ]'" type="text"/>
-				<param name="output_name_Array_text" label="output_name" optional="true" help="Please provide comma-seperated values of type text here." type="text"/>
-				<param name="plot_name_Array_text" label="plot_name" optional="true" help="Please provide comma-seperated values of type text here." type="text"/>
-				<param name="plot_title_Array_text" label="plot_title" optional="true" help="Please provide comma-seperated values of type text here." type="text"/>
+			<when value="mean-by-group">
+				<param name="input_data" label="Input table" optional="false" help="URL to the input table containing group identifier(s) and a value column. Groups are defined by one or more columns. Other columns present in the table will be removed in the process, retaining only those specified in cols_to_group_by and value_col. For example, use the result table from peri_conv. (URL must be stored in a .txt file)" type="data" format="txt"/>
+				<param name="colnames_to_group_by" label="Column names identifying group" optional="false" help="One or more column names identifying the group. A combination of all specified columns will be used to define unique groups for calculating the average value. Example: 'longitude, latitude, Year_adj_generated, group_labels, HELCOM_ID'. Another example: 'Year_adj_generated, group_labels, HELCOM_ID'." type="text"/>
+				<param name="colname_value" label="Column name for column containing values" optional="false" help="The name of the column that contains the values for which the average will be calculated. Only one column name can be included. Examples: 'transparency_m', 'mean'" type="text"/>
 			</when>
-			<when value="reproject-image">
-				<param name="input_image" label="input_image" optional="false" type="data" format="txt"/>
-				<param name="output_dimensions_Array_integer" label="output_dimensions" optional="true" help="Please provide comma-seperated values of type integer here." type="text"/>
-				<param name="output_resolution_Array_integer" label="output_resolution" optional="true" help="Please provide comma-seperated values of type integer here." type="text"/>
-				<param name="output_name" label="Output file name" optional="false" help="Name to apply for the output GeoTiff file." type="text"/>
+			<when value="ts-selection-interpolation">
+				<param name="input_data" label="Input table" optional="false" help="URL to the input table containing data for selection and interpolation. This table includes grouping variables (if applicable), the year (or other time identifier) and the value columns to be interpolated. For example, use the result from mean_by_group. (URL must be stored in a .txt file)" type="data" format="txt"/>
+				<param name="colnames_relevant" label="Column names identifying group(s)" optional="false" help="Column name(s) describing relevant values in the dataset. These columns are treated as grouping identifiers, and a combination of all specified columns will be used to define unique groups. For each group, a separate time series is analyzed and interpolated individually." type="text"/>
+				<param name="missing_threshold_percentage" label="Threshold for missing values" optional="false" help="Threshold for the allowed percentage of missing data points (NAs). For example, a value of 40 means series with more than 40% missing data will be removed. Example = '40'." type="float" min="0" max="100"/>
+				<param name="colname_year" label="Column name for time" optional="false" help="The name of the column containing the year (or other time identifier, such as quarter, month, or day). Example = 'year'" type="text"/>
+				<param name="colname_value" label="Column name for values" optional="false" help="The name of the column containing the values to be considered for interpolation." type="text"/>
+				<param name="min_data_point" label="Minimum number of data points required" optional="false" help="The minimum number of data points required in a time series for it to be included in the interpolation process. Example = '10'." type="integer" min="0"/>
 			</when>
-			<when value="select-products-sentinel2">
-				<param name="date" label="Central date" optional="true" help="Date around which ±delta-days will be applied for search. If omitted, 'Time of interest' input must be provided instead." type="text"/>
-				<param name="delta" label="Delta" optional="true" type="text"/>
-				<param name="toi_Array_text" label="Time of interest" optional="true" help="Start and end date-time strings. Must be provided if 'date' input is omitted. Please provide comma-seperated values of type text here." type="text"/>
-				<param name="aoi" label="Area of interest" optional="false" help="Polygon defining the area of interest." type="data" format="txt"/>
-				<param name="collection" label="Collection" optional="false" type="text"/>
-				<param name="product_level" label="Product level" optional="true" help="Please provide comma-seperated values of type text here." type="select">
-					<option value="L1C">L1C</option>
-					<option value="L2A">L2A</option>
+			<when value="trend-analysis-mk">
+				<param name="input_data" label="Input table" optional="false" help="URL to the input table containing the time series data. This table includes grouping identifiers (if applicable), columns for time (e.g., year, month) and values to be analyzed for trends. For example, use the result from ts_selection_interpolation. (URL must be stored in a .txt file)" type="data" format="txt"/>
+				<param name="colnames_relevant" label="Column names identifying group(s)" optional="false" help="Column name(s) identifying relevant groups in the dataset. These columns will be used to define unique groups for which separate trend analyses are performed." type="text"/>
+				<param name="colname_time" label="Column name for time" optional="false" help="The name of the column containing the time variable (e.g., year, month) to be used in the trend analysis. Example = 'year'." type="text"/>
+				<param name="colname_value" label="Column name for values" optional="false" help="The name of the column containing the values to be analyzed in the Man-Kendall trend test." type="text"/>
+			</when>
+			<when value="barplot-trend-results">
+				<param name="input_data" label="Input table" optional="false" help="URL to the input table containing statistical analysis results. The table must include columns for test values, p-values, and group identifiers. (URL must be stored in a .txt file)" type="data" format="txt"/>
+				<param name="colname_id" label="Column name for identifier" optional="false" help="The name of the column containing group or sample identifiers, e.g., polygon id. Example = 'polygon_id'" type="text"/>
+				<param name="colname_test_value" label="Column name for test value" optional="false" help="The name of the column containing the test values (e.g., statistical coefficients) to be plotted on the Y-axis, e.g., Tau for Mann-Kendall test." type="text"/>
+				<param name="colname_p_value" label="Column name for p value" optional="false" help="The name of the column containing p values, used to determine bar transparency. Example = 'p_value'" type="text"/>
+				<param name="p_value_threshold" label="p value threshold for significance" optional="false" help="The threshold for distinguishing significant from insignificant values. It adjusts the transparency of bars in the plot. Example = '0.05'" type="float" min="0.01" max="0.1"/>
+				<param name="colname_group" label="Column name for subgroups" optional="false" help="The name of the column that defines the subgroups or categories to be displayed on the X-axis, e.g., seasons for every polygon_id." type="text"/>
+			</when>
+			<when value="map-trends-static">
+				<param name="regions" label="Study region or study subregions" optional="false" help="URL to the study region, or several regions, used to classify the input data into groups of interest. Currently it has to be provided as a shapefile. It can be in any coordinate system and will be transformed to WGS84 during this process. (URL must be stored in a .txt file)" type="data" format="txt"/>
+				<param name="input_data" label="Input table" optional="false" help="URL to the input table containing statistical analysis results. The table must include columns for test values, p-values, and identifiers linking to study region. (URL must be stored in a .txt file)" type="data" format="txt"/>
+				<param name="colname_id_trend" label="Column name of study region identifier" optional="false" help="The name of the column containing identifiers for study regions, which must correspond to the identifiers in the shapefile (shp). Example = 'id'" type="text"/>
+				<param name="colname_region_id" label="Column name of study region identifier" optional="false" help="The name of the column in the input data that contains identifiers for study regions, corresponding to the identifiers in the shapefile. Example = 'id'" type="text"/>
+				<param name="colname_group" label="Column name for subgroups" optional="false" help="The name of the column that defines the subgroups or categories to be displayed on the X-axis, e.g., seasons for every polygon_id." type="text"/>
+				<param name="p_value_threshold" label="p value threshold for significance" optional="false" help="The threshold for distinguishing significant from insignificant values. It adjusts the transparency of bars in the plot. Default = 0.05" type="float" min="0.01" max="0.1"/>
+				<param name="colname_p_value" label="Column name for p value" optional="false" help="The name of the column containing p values, used to determine bar transparency. Example = 'p_value'" type="text"/>
+			</when>
+			<when value="map-shapefile-points">
+				<param name="regions" label="Study region or study subregions" optional="false" help="URL to the study region, or several regions, to classify the input data into groups of interest. Currently it has to be provided as a shapefile. It can be in any coordinate system and will be transformed to WGS84 during this process. (URL must be stored in a .txt file)" type="data" format="txt"/>
+				<param name="input_data" label="Data table to be plotted on top of study regions" optional="false" help="URL to the input table containing the in-situ data points with coordinates. (URL must be stored in a .txt file)" type="data" format="txt"/>
+				<param name="colname_long" label="Column name for longitude" optional="false" help="The name of the column containing longitude values for the data points." type="text"/>
+				<param name="colname_lat" label="Column name for latitude" optional="false" help="The name of the column containing latitude values for the data points." type="text"/>
+				<param name="colname_value_name" label="Column name of data point identifier" optional="false" help="The name of the column containing identifier (e.g., site name) or values (e.g., depth) to color the points according to their corresponding values." type="text"/>
+				<param name="colname_region_id" label="Column name of region identifier" optional="false" help="The name of the column containing identifiers (e.g., basin name) to distinguish the polygons on the map if multiple regions are present." type="text"/>
+			</when>
+			<when value="owt-classification">
+				<param name="input_data_url" label="Input data" optional="false" help="URL to your input file. Find example data on https://github.com/bishun945/pyOWT/tree/main/projects/AquaINFRA. (URL must be stored in a .txt file)" type="data" format="txt"/>
+				<param name="input_option" label="Type of input" optional="false" value="csv" help="csv: for text data input (first line wavelength, following lines remote-sensing reflectance). sat: for satellite product input containing reflectance (e.g., Sentinel-3 OLCI Level-2)" type="select">
+					<option value="csv">csv</option>
+					<option value="sat">sat</option>
 				</param>
-				<param name="catalog" label="catalog" optional="false" type="select">
-					<option value="copernicus">copernicus</option>
-					<option value="earth-search">earth-search</option>
+				<param name="sensor" label="Sensor name" optional="false" value="HYPER" help="Spectral band configuration of satellite mission (includes adaptation to sensor spectral response functions)." type="select">
+					<option value="HYPER">HYPER</option>
+					<option value="AERONET_OC_1">AERONET_OC_1</option>
+					<option value="AERONET_OC_2">AERONET_OC_2</option>
+					<option value="CMEMS_BAL_HROC">CMEMS_BAL_HROC</option>
+					<option value="CMEMS_BAL_NRT">CMEMS_BAL_NRT</option>
+					<option value="CMEMS_MED_MYINT">CMEMS_MED_MYINT</option>
+					<option value="CZCS">CZCS</option>
+					<option value="GOCI">GOCI</option>
+					<option value="HawkEye">HawkEye</option>
+					<option value="MERIS">MERIS</option>
+					<option value="ODIS_Aqua">ODIS_Aqua</option>
+					<option value="MODIS_Terra">MODIS_Terra</option>
+					<option value="MSI_S2A">MSI_S2A</option>
+					<option value="MSI_S2B">MSI_S2B</option>
+					<option value="OCTS">OCTS</option>
+					<option value="OLCI_S3A">OLCI_S3A</option>
+					<option value="OLCI_S3B">OLCI_S3B</option>
+					<option value="OLI">OLI</option>
+					<option value="SeaWiFS">SeaWiFS</option>
+					<option value="VIIRS_JPSS1">VIIRS_JPSS1</option>
+					<option value="VIIRS_JPSS2">VIIRS_JPSS2</option>
+					<option value="VIIRS_SNPP">VIIRS_SNPP</option>
 				</param>
-				<param name="cloud_cover" label="Cloud cover" optional="true" type="float"/>
+				<param name="output_option" label="Output option" optional="false" value="1" help="1: for standard output with five variables. 2: for extensive output including memberships of all water types." type="select">
+					<option value="1">1</option>
+					<option value="2">2</option>
+				</param>
 			</when>
 		</conditional>
 	</inputs>
@@ -112,6 +130,6 @@
 		<data name="output_data" format="txt" label="$select_process"/>
 	</outputs>
 	<expand macro="tests"/>
-	<help>Some help text.</help>
+	<help>Use the dropdown menu at the top to select the OGC API processes hosted on https://aquainfra.ogc.igb-berlin.de/pygeoapi/ and then complete the corresponding form to run the service.</help>
 	<expand macro="citations"/>
 </tool>
