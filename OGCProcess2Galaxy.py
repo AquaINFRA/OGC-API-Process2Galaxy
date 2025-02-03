@@ -5,7 +5,7 @@ import warnings
 import sys
 import xml.dom.minidom as md
 
-#execute: python3 OGCProcess2Galaxy.py aqua.json
+#EXECUTE: python3 OGCProcess2Galaxy.py aqua.json
 
 # OGC Process Description types to Galaxy parameter types
 TYPE_MAPPING = {
@@ -64,6 +64,32 @@ def save_xml(tool, filename="generic.xml"):
     
     print(f"--> {filename} exported")
 
+def load_json(url):
+    """ Load JSON data from a URL with error handling. """
+    try:
+        with urllib.request.urlopen(url) as response:
+            return json.load(response)
+    except Exception as e:
+        print(f"Error loading JSON from {url}: {e}")
+        return None
+
+
+def validate_conformance(server_url):
+    """ Check if the server conforms to required OGC standards. """
+    conformance_url = f"{server_url}conformance"
+    conformance_data = load_json(conformance_url)
+
+    if not conformance_data or "conformsTo" not in conformance_data:
+        warnings.warn(f"Could not verify conformance for {server_url}.", Warning)
+        return False
+
+    non_compliant_classes = [cls for cls in CONF_CLASSES if cls not in conformance_data["conformsTo"]]
+    
+    for conf_class in non_compliant_classes:
+        warnings.warn(f"{server_url} does not conform to {conf_class}. This may cause issues.", Warning)
+
+    return not non_compliant_classes
+
 def OGCAPIProcesses2Galaxy(config_file):
     """ Main function to convert OGC API processes to Galaxy tools. """
     with open(config_file, encoding="utf-8") as f:
@@ -76,39 +102,15 @@ def OGCAPIProcesses2Galaxy(config_file):
     command.set("detect_errors", "exit_code")
     commands = []
 
-    #add inputs
     inputs = ET.Element("inputs")
 
     index_i = 0
-    for api in config["servers"]: 
-        #get server 
-        #server = api["server_url"]
+    for server in config["servers"]: 
 
         index_i += 1
 
-        #check conformance
-        with urllib.request.urlopen(api["server_url"] + "conformance") as conformanceURL:
-            #Retrieve conformance data
-            conformanceData = json.load(conformanceURL)
-            
-            #Set conformance to True
-            conformance = True
-
-            #Iterate over conformance classes
-            for confClass in CONF_CLASSES:
-                #Ceck if conformance class is implemented
-                if confClass not in conformanceData["conformsTo"]:
-                    #Create warnning and set conformance to False if certain conformance class is not implemented
-                    msg = "Specified API available via:" + api["server_url"] + " does not conform to " + confClass + ". This may lead to issues when converting its processes to Galaxy tools."
-                    warnings.warn(msg, Warning)
-                    conformance = False               
-
-            #Set help text for tool
-            if conformance:
-                help.text = config["help"]
-            else:
-                #If API might not be complient with OGC processes API add notification to help text
-                help.text = config["help"] + " Take note that the service provided by this does not implement all nesseracy OGC API Processes conformance classes and might thus not behave as expected!"
+        if not validate_conformance(server["server_url"]):
+            continue
 
         #Create process selectors
         conditional_process = ET.Element("conditional")
@@ -118,24 +120,24 @@ def OGCAPIProcesses2Galaxy(config_file):
         select_process.set("type", "select")
         select_process.set("label", "Select process")
 
-        with urllib.request.urlopen(api["server_url"] + "processes" + api["filter"]) as processesURL:
-            #retrieve process data
-            processesData = json.load(processesURL)
+        processes_data = load_json(f"{server['server_url']}processes{server['filter']}")
+        if not processes_data:
+            continue
             
-            when_list_processes = []
-            #Iterate over processes
-            for process in processesData["processes"]: #only get 50 processes!
+        when_list_processes = []
+        #Iterate over processes
+        for process in processes_data["processes"]: #only get 50 processes!
                 
                 #command information for process
-                processCommand = {"server": api["server_url"], "process": process["id"]}
+                processCommand = {"server": server["server_url"], "process": process["id"]}
 
                 #check if process is excluded
-                if(process["id"] in api["excluded_services"]):
+                if(process["id"] in server["excluded_services"]):
                     continue
 
                 #check if process is included
-                if(process["id"] in api["included_services"] or ("*" in api["included_services"] and len(api["included_services"]) == 1)):
-                    with urllib.request.urlopen(api["server_url"] + "processes/" + process["id"]) as processURL:
+                if(process["id"] in server["included_services"] or ("*" in server["included_services"] and len(server["included_services"]) == 1)):
+                    with urllib.request.urlopen(server["server_url"] + "processes/" + process["id"]) as processURL:
                         #Retrieve process data
                         process = json.load(processURL)
                         processElement = ET.Element("option")
