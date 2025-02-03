@@ -5,6 +5,7 @@ import warnings
 import sys
 import xml.dom.minidom as md
 
+#execute: python3 OGCProcess2Galaxy.py aqua.json
 #OGC Process Description types to galaxy parameter types
 typeMapping = {
   "array": "text",
