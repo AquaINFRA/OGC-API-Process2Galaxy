@@ -46,9 +46,11 @@ def load_json(url):
 def save_xml(tool, filename="generic.xml"):
     """Save the generated XML file with proper formatting."""
     xml_string = ET.tostring(tool, encoding="unicode")
-    formatted_xml = md.parseString(xml_string).toprettyxml()
+    formatted_xml = md.parseString(xml_string).toprettyxml(indent="    ")
     formatted_xml = formatted_xml.replace("&lt;", "<")
     formatted_xml = formatted_xml.replace("&gt;", ">")
+
+    formatted_xml = "\n".join(line for line in formatted_xml.splitlines() if not line.strip().startswith("<?xml"))
 
     with open(filename, "w", encoding="utf-8") as f:
         f.write(formatted_xml)
@@ -77,7 +79,7 @@ def create_tool_element(config):
     tool = ET.Element("tool", id=config["id"], name=config["title"], version=config["version"], profile=config.get("profile", ""))
     
     ET.SubElement(tool, "description").text = config["description"]
-    ET.SubElement(tool, "help").text = config["help"]
+    #ET.SubElement(tool, "help").text = config["help"]
     ET.SubElement(ET.SubElement(tool, "macros"), "import").text = "macros.xml"
     
     creator = ET.SubElement(tool, "creator")
@@ -137,6 +139,7 @@ def handle_formats_and_enums(process_input, schema, schema_type):
 
     if "enum" in schema:
         process_input.set("type", "select")
+        process_input.attrib.pop("value", None) 
         for enum_value in distinct_subarray(schema["enum"]):
             option = ET.Element("option", value=enum_value)
             option.text = enum_value
@@ -191,7 +194,7 @@ def OGCAPIProcesses2Galaxy(config_file):
 
         inputs.append(conditional_process)
 
-    command.text = f"<![CDATA[\n\tRscript '$__tool_directory__/{config['script']}'\n\t\t--outputData '$output_data'\n    ]]>"
+    command.text = f"<![CDATA[\n    Rscript '$__tool_directory__/{config['script']}'\n        --outputData '$output_data'\n    ]]>"
     tool.append(command)
     
     #add configfiles
@@ -203,6 +206,7 @@ def OGCAPIProcesses2Galaxy(config_file):
     tool.append(inputs)
     ET.SubElement(tool, "outputs").append(ET.Element("data", name="output_data", format="txt", label="$select_process"))
     ET.SubElement(tool, "expand", macro="tests")
+    ET.SubElement(tool, "help").text = config["help"]
     ET.SubElement(tool, "expand", macro="citations")
 
     save_xml(tool)
