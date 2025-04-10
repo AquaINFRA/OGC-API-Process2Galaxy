@@ -16,7 +16,7 @@ TYPE_MAPPING = {
 }
 
 # Recognized media types
-MEDIA_TYPES = {"image/tiff", "image/jpeg", "image/png", "text/xml", "text/plain", "application/octet-stream"}
+MEDIA_TYPES = {"image/tiff", "image/jpeg", "image/png", "text/xml", "text/plain", "application/octet-stream", "application/zip", "application/json", "application/csv"}
 
 # Conformance classes
 CONF_CLASSES = {
@@ -227,6 +227,7 @@ def process_server_processes(server, processes_data, select_process, config):
             continue
 
         add_process_option(select_process, process_details)
+        print(process["id"])
         when_process = ET.Element("when", value=process["id"])
 
         # Add process inputs

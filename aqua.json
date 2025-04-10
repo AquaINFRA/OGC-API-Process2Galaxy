@@ -1,10 +1,10 @@
 {
     "servers":[
         {
-            "server_url": "https://aquainfra.ogc.igb-berlin.de/pygeoapi/",
+            "server_url": "http://localhost:5000/",
             "included_services": ["*"],
             "filter": "",
-            "excluded_services": ["hello-world", "tordera-gloria"]
+            "excluded_services": ["hello-world"]
         }
     ],
     "id":"aquainfra_ogc_api_processes",
