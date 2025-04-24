@@ -1,10 +1,17 @@
 {
     "servers":[
         {
-            "server_url": "http://localhost:5000/",
+            "server_url": "https://aquainfra.ogc.igb-berlin.de/pygeoapi/",
             "included_services": ["*"],
             "filter": "",
-            "excluded_services": ["hello-world"]
+            "excluded_services": [
+                "hello-world", 
+                "retrieve-biodiversity-data",
+                "match-data",
+                "check-names",
+                "pred-extract", 
+                "multidetect-and-clean",
+                "riverload"]
         }
     ],
     "id":"aquainfra_ogc_api_processes",

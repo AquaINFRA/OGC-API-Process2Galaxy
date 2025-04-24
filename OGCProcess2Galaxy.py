@@ -177,8 +177,8 @@ def OGCAPIProcesses2Galaxy(config_file):
     inputs = ET.Element("inputs")
 
     for server in config["servers"]:
-        if not validate_conformance(server["server_url"]):
-            continue
+        #if not validate_conformance(server["server_url"]):
+        #    continue
 
         conditional_process = ET.Element("conditional", name="conditional_process")
         select_process = ET.Element("param", name="select_process", type="select", label="Select process")
