@@ -10,8 +10,7 @@
                 "match-data",
                 "check-names",
                 "pred-extract", 
-                "multidetect-and-clean",
-                "riverload"]
+                "multidetect-and-clean"]
         }
     ],
     "id":"aquainfra_ogc_api_processes",
@@ -73,6 +72,42 @@
         {
             "process": "owt-classification",
             "param_name": "input_data_url"
+        },
+        {
+            "process": "riverload",
+            "param_name": "input_toc_urls"
+        },
+        {
+            "process": "riverload",
+            "param_name": "input_discharge_urls"
+        },
+        {
+            "process": "retrieve-biodiversity-data",
+            "param_name": "study_area"
+        },
+        {
+            "process": "match-data",
+            "param_name": "input_data_retrieved"
+        },
+        {
+            "process": "match-data",
+            "param_name": "input_data_from_user"
+        },
+        {
+            "process": "check-names",
+            "param_name": "input_data"
+        },
+        {
+            "process": "pred-extract",
+            "param_name": "input_data"
+        },
+        {
+            "process": "pred-extract",
+            "param_name": "study_area"
+        },
+        {
+            "process": "multidetect-and-clean",
+            "param_name": "input_data"
         }
     ]
 }

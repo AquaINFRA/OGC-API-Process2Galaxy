@@ -100,7 +100,10 @@ def create_process_input(param_name, param_details, config, process_id):
     process_input.set("optional", str(optional).lower())
     # Set default value
     if "default" in param_details.get("schema", {}):
-        process_input.set("value", str(param_details["schema"]["default"]))
+        if (str(param_details["schema"]["type"])=="boolean"):
+            process_input.set("checked", str(param_details["schema"]["default"]))
+        else:
+            process_input.set("value", str(param_details["schema"]["default"]))
     description = param_details.get('description', '').replace('"', "'")
     process_input.set("help", f"{description}")
 
