@@ -74,12 +74,20 @@
             "param_name": "input_data_url"
         },
         {
+            "process": "tordera-gloria-connection",
+            "param_name": "swat_output_file"
+        },
+        {
             "process": "riverload",
             "param_name": "input_toc_urls"
         },
         {
             "process": "riverload",
             "param_name": "input_discharge_urls"
+        },
+        {
+            "process": "syke-corine-stats-real-areas",
+            "param_name": "input_url_shapefile"
         },
         {
             "process": "retrieve-biodiversity-data",
