@@ -15,7 +15,7 @@
     ],
     "id":"aquainfra_ogc_api_processes",
     "title":"AquaINFRA OGC API Processes",
-    "version":"0.3.0",
+    "version":"0.6.0",
     "profile":"22.05",
     "description": "",
     "help": "Use the dropdown menu at the top to select the OGC API processes hosted on https://aquainfra.ogc.igb-berlin.de/pygeoapi/ and then complete the corresponding form to run the service.",
