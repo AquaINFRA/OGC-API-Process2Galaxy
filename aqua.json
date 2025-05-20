@@ -108,6 +108,10 @@
         {
             "process": "multidetect-and-clean",
             "param_name": "input_data"
+        },
+        {
+            "process": "mitgcm-resultplots",
+            "param_name": "netcdf_input_file"
         }
     ]
 }
