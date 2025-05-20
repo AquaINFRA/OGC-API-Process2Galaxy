@@ -44,7 +44,9 @@
                     <option value="y-m-d">y-m-d</option>
                     <option value="y/m/d">y/m/d</option>
                 </param>
-                <param name="group_to_periods" label="Periods to group the data into" optional="true" value="Dec-01:Mar-01,Mar-02:May-30,Jun-01:Aug-30,Sep-01:Nov-30" help="Define the periods that you want the data to be grouped into. Please follow the example (which is also the default): 'Dec-01:Mar-01,Mar-02:May-30,Jun-01:Aug-30,Sep-01:Nov-30' (first three letters of each month, then a minus/hyphen, then the day (two digits), then comma, then the next period)." type="text"/>
+                <param name="group_to_periods" label="Periods to group the data into" optional="true" value="Dec-01:Mar-01,Mar-02:May-30,Jun-01:Aug-30,Sep-01:Nov-30" help="Define the periods that you want the data to be grouped into. Please follow the example (which is also the default): 'Dec-01:Mar-01,Mar-02:May-30,Jun-01:Aug-30,Sep-01:Nov-30' (first three letters of each month, then a minus/hyphen, then the day (two digits), then comma, then the next period)." type="text">
+                    <validator type="regex">^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)-[0-3][0-9]:(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)-[0-3][0-9](,(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)-[0-3][0-9]:(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)-[0-3][0-9])*$</validator>
+                </param>
                 <param name="period_labels" label="Period labels" optional="true" value="winter,spring,summer,autumn" help="Define names for the periods defined above, separated by a comma. Example (which is also the default): 'winter,spring,summer,autumn'." type="text"/>
                 <param name="year_starts_at_dec1" label="Include December into next year" optional="true" checked="True" help="Tell whether the years in your grouping starts at first of December ('true') or not ('false'). This has to be reflected in the period definitions, these should not contradict each other. Defaults to 'true'." type="boolean" truevalue="True" falsevalue="False"/>
             </when>
@@ -138,7 +140,7 @@
                 <param name="end_date" label="End Date" optional="true" help="End date of the simulation in the format yyyymmdd. Defaults to: 20201231. Latest possible date for the default input project: 20221231." type="integer"/>
             </when>
             <when value="tordera-gloria-connection">
-                <param name="swat_output_file" label="SWAT+ Variable Outputs Database" optional="false" help="SQLite database (thread_1.sqlite) storing the simulated output values based on the defined time range and time step (daily, monthly, yearly, or annual average)." type="data"/>
+                <param name="swat_output_file" label="SWAT+ Variable Outputs Database" optional="false" help="SQLite database (thread_1.sqlite) storing the simulated output values based on the defined time range and time step (daily, monthly, yearly, or annual average)." type="data" format="txt"/>
             </when>
             <when value="riverload">
                 <param name="input_toc_urls" label="Input Total Organic Carbon (TOC)" optional="false" help="URL to in situ Total Organic Carbon (TOC) data (date, value). If the data is divided into parts, please provide several URLs separated by a comma. All URLs need to start with http(s). (URL must be stored in a .txt file)" type="data" format="txt"/>
