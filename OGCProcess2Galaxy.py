@@ -11,7 +11,7 @@ TYPE_MAPPING = {
     "boolean": "boolean",
     "integer": "integer",
     "number": "float",
-    "object": "data",
+    "object": "text",
     "string": "text"
 }
 
@@ -126,11 +126,11 @@ def create_process_input(param_name, param_details, config, process_id):
 
 
     # Handle formats and enums
-    handle_formats_and_enums(process_input, schema, schema_type)
+    handle_formats_and_enums(process_input, schema, schema_type, process_id, param_name, config)
 
     return process_input
 
-def handle_formats_and_enums(process_input, schema, schema_type):
+def handle_formats_and_enums(process_input, schema, schema_type, process_id, param_name, config):
     """Handle media types, enums, booleans, and array-specific settings."""
     if schema.get("format") == "binary" or schema.get("contentMediaType") in MEDIA_TYPES:
         process_input.set("type", "data")
@@ -153,20 +153,27 @@ def handle_formats_and_enums(process_input, schema, schema_type):
     if "maximum" in schema:
         process_input.set("max", str(schema["maximum"]))
 
-    if schema_type == "array" and 'items' in schema:
-        handle_array_inputs(process_input, schema["items"])
+    if schema_type == "array":# and 'items' in schema:
+        process_input.set("name", f"{process_input.attrib['name']}_array")
+        #handle_array_inputs(process_input, schema["items"])
+        #handle_array_inputs(process_input)
+    
+    if schema_type == "object":# and 'items' in schema:
+        if not any(process_id == inp["process"] and param_name == inp["param_name"] for inp in config["input_data_params"]):
+            process_input.set("name", f"{process_input.attrib['name']}_object")
 
 
-def handle_array_inputs(process_input, items_schema):
-    """Handle array type inputs."""
-    if 'type' in items_schema:
-        process_input.set("name", f"{process_input.attrib['name']}_Array_{TYPE_MAPPING[items_schema['type']]}")
-        process_input.set("help", f"Please provide comma-separated values of type {TYPE_MAPPING[items_schema['type']]} here.")
-    elif 'oneOf' in items_schema:
-        for item_option in items_schema["oneOf"]:
-            if item_option.get('type') == "object":
-                process_input.set("type", "data")
-                process_input.set("format", "txt")
+#def handle_array_inputs(process_input):#, items_schema):
+#    """Handle array type inputs."""
+#    process_input.set("name", f"{process_input.attrib['name']}_array_string")
+    #if 'type' in items_schema:
+    #    process_input.set("name", f"{process_input.attrib['name']}_Array_{TYPE_MAPPING[items_schema['type']]}")
+    #    process_input.set("help", f"Please provide comma-separated values of type {TYPE_MAPPING[items_schema['type']]} here.")
+    #elif 'oneOf' in items_schema:
+    #    for item_option in items_schema["oneOf"]:
+    #        if item_option.get('type') == "object":
+    #            process_input.set("type", "data")
+    #            process_input.set("format", "txt")
 
 
 # Main Processing Function
@@ -230,7 +237,7 @@ def process_server_processes(server, processes_data, select_process, config):
             continue
 
         add_process_option(select_process, process_details)
-        print(process["id"])
+        #print(process["id"])
         when_process = ET.Element("when", value=process["id"])
 
         # Add process inputs

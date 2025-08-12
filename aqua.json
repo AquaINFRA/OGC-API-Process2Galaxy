@@ -6,11 +6,18 @@
             "filter": "",
             "excluded_services": [
                 "hello-world", 
-                "retrieve-biodiversity-data",
-                "match-data",
-                "check-names",
-                "pred-extract", 
-                "multidetect-and-clean"]
+                "heat1advanced",
+                "heat2advanced",
+                "heat3advanced",
+                "heat4advanced",
+                "heat5advanced",
+                "heat1",
+                "heat2",
+                "heat3",
+                "heat4",
+                "heat5",
+                "malta-test"
+            ]
         }
     ],
     "id":"aquainfra_ogc_api_processes",
@@ -78,6 +85,14 @@
             "param_name": "swat_output_file"
         },
         {
+            "process": "tordera-gloria",
+            "param_name": "TextInOut_URL"
+        },
+        {
+            "process": "tordera-gloria",
+            "param_name": "par_cal"
+        },
+        {
             "process": "riverload",
             "param_name": "input_toc_urls"
         },
@@ -90,20 +105,28 @@
             "param_name": "input_url_shapefile"
         },
         {
+            "process": "mitgcm-resultplots",
+            "param_name": "netcdf_input_file"
+        },
+        {
             "process": "retrieve-biodiversity-data",
-            "param_name": "study_area"
+            "param_name": "species_names_url"
+        },
+        {
+            "process": "retrieve-biodiversity-data",
+            "param_name": "study_area_shapefile"
+        },
+        {
+            "process": "retrieve-biodiversity-data",
+            "param_name": "study_area_geojson_url"
         },
         {
             "process": "match-data",
-            "param_name": "input_data_retrieved"
-        },
-        {
-            "process": "match-data",
-            "param_name": "input_data_from_user"
+            "param_name": "input_datasets"
         },
         {
             "process": "check-names",
-            "param_name": "input_data"
+            "param_name": "species_names_url"
         },
         {
             "process": "pred-extract",
@@ -111,15 +134,15 @@
         },
         {
             "process": "pred-extract",
-            "param_name": "study_area"
+            "param_name": "study_area_extent"
+        },
+        {
+            "process": "pred-extract",
+            "param_name": "study_area_geojson_url"
         },
         {
             "process": "multidetect-and-clean",
             "param_name": "input_data"
-        },
-        {
-            "process": "mitgcm-resultplots",
-            "param_name": "netcdf_input_file"
         }
     ]
 }
