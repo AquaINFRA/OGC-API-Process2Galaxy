@@ -104,6 +104,21 @@ def create_process_input(param_name, param_details, config, process_id):
             process_input.set("checked", str(param_details["schema"]["default"]))
         else:
             process_input.set("value", str(param_details["schema"]["default"]))
+    if not optional and "default" not in param_details.get("schema", {}):
+        if(str(param_details["schema"]["type"])=="boolean"):
+            process_input.set("checked", "false")
+        if(str(param_details["schema"]["type"])=="string" or 
+           str(param_details["schema"]["type"])=="object" or
+           str(param_details["schema"]["type"])=="array"):
+            process_input.set("value", "")
+            validator = ET.Element("validator")
+            validator.set("type", "empty_field")
+            validator.set("message", "You must provide a value.")
+            process_input.append(validator)
+        if(str(param_details["schema"]["type"])=="integer"):
+            process_input.set("value", "0")
+        if(str(param_details["schema"]["type"])=="number"):
+            process_input.set("value", "0.0")            
     description = param_details.get('description', '').replace('"', "'")
     process_input.set("help", f"{description}")
 
@@ -123,7 +138,10 @@ def create_process_input(param_name, param_details, config, process_id):
         process_input.set("format", "txt")
         description = param_details.get('description', '').replace('"', "'")
         process_input.set("help", f"{description} (URL must be stored in a .txt file)")
-
+        process_input.attrib.pop("value", None)
+        for child in list(process_input):
+            if child.tag == "validator":
+                process_input.remove(child)
 
     # Handle formats and enums
     handle_formats_and_enums(process_input, schema, schema_type, process_id, param_name, config)
