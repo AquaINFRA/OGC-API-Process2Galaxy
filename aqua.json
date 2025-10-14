@@ -5,17 +5,7 @@
             "included_services": ["*"],
             "filter": "",
             "excluded_services": [
-                "hello-world", 
-                "heat1advanced",
-                "heat2advanced",
-                "heat3advanced",
-                "heat4advanced",
-                "heat5advanced",
-                "heat1",
-                "heat2",
-                "heat3",
-                "heat4",
-                "heat5",
+                "hello-world",
                 "malta-test"
             ]
         }
@@ -143,6 +133,54 @@
         {
             "process": "multidetect-and-clean",
             "param_name": "input_data"
+        },
+        {
+            "process": "heat2",
+            "param_name": "units_gridded"
+        },
+        {
+            "process": "heat3",
+            "param_name": "units_cleaned"
+        },
+        {
+            "process": "heat3",
+            "param_name": "station_samples"
+        },
+        {
+            "process": "heat4",
+            "param_name": "annual_indicators"
+        },
+        {
+            "process": "heat5",
+            "param_name": "assessment_indicators"
+        },
+        {
+            "process": "heat1advanced",
+            "param_name": "spatial_units"
+        },
+        {
+            "process": "heat1advanced",
+            "param_name": "grid_size_table"
+        },
+        {
+            "process": "heat2advanced",
+            "param_name": "units_gridded"
+        },
+        {
+            "process": "heat3advanced",
+            "param_name": "station_samples"
+        },
+        {
+            "process": "heat3advanced",
+            "param_name": "spatial_units"
+        },
+        {
+            "process": "heat4advanced",
+            "param_name": "annual_indicators"
+        },
+        {
+            "process": "heat5advanced",
+            "param_name": "assessment_indicators"
         }
     ]
 }

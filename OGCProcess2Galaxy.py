@@ -107,14 +107,14 @@ def create_process_input(param_name, param_details, config, process_id):
     if not optional and "default" not in param_details.get("schema", {}):
         if(str(param_details["schema"]["type"])=="boolean"):
             process_input.set("checked", "false")
-        if(str(param_details["schema"]["type"])=="string" or 
-           str(param_details["schema"]["type"])=="object" or
-           str(param_details["schema"]["type"])=="array"):
+        if str(param_details["schema"]["type"]) in ("string", "object", "array"):
             process_input.set("value", "")
             validator = ET.Element("validator")
             validator.set("type", "empty_field")
             validator.set("message", "You must provide a value.")
-            process_input.append(validator)
+            enum_values = param_details.get("schema", {}).get("enum")
+            if not enum_values:
+                process_input.append(validator)
         if(str(param_details["schema"]["type"])=="integer"):
             process_input.set("value", "0")
         if(str(param_details["schema"]["type"])=="number"):
