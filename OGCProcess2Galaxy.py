@@ -47,8 +47,8 @@ def save_xml(tool, filename="generic.xml"):
     """Save the generated XML file with proper formatting."""
     xml_string = ET.tostring(tool, encoding="unicode")
     formatted_xml = md.parseString(xml_string).toprettyxml(indent="    ")
-    formatted_xml = formatted_xml.replace("&lt;", "<")
-    formatted_xml = formatted_xml.replace("&gt;", ">")
+    #formatted_xml = formatted_xml.replace("&lt;", "<")
+    #formatted_xml = formatted_xml.replace("&gt;", ">")
 
     formatted_xml = "\n".join(line for line in formatted_xml.splitlines() if not line.strip().startswith("<?xml"))
 
@@ -104,7 +104,9 @@ def create_process_input(param_name, param_details, config, process_id):
             process_input.set("checked", str(param_details["schema"]["default"]))
         else:
             process_input.set("value", str(param_details["schema"]["default"]))
-    if not optional and "default" not in param_details.get("schema", {}):
+    #if not optional and "default" not in param_details.get("schema", {}):
+    #if not optional and param_details.get("default") in (None, ""):
+    if not optional:
         if(str(param_details["schema"]["type"])=="boolean"):
             process_input.set("checked", "false")
         if str(param_details["schema"]["type"]) in ("string", "object", "array"):
@@ -115,9 +117,9 @@ def create_process_input(param_name, param_details, config, process_id):
             enum_values = param_details.get("schema", {}).get("enum")
             if not enum_values:
                 process_input.append(validator)
-        if(str(param_details["schema"]["type"])=="integer"):
+        if(str(param_details["schema"]["type"])=="integer") and "default" not in param_details.get("schema", {}):
             process_input.set("value", "0")
-        if(str(param_details["schema"]["type"])=="number"):
+        if(str(param_details["schema"]["type"])=="number") and "default" not in param_details.get("schema", {}):
             process_input.set("value", "0.0")            
     description = param_details.get('description', '').replace('"', "'")
     process_input.set("help", f"{description}")
@@ -150,9 +152,9 @@ def create_process_input(param_name, param_details, config, process_id):
 
 def handle_formats_and_enums(process_input, schema, schema_type, process_id, param_name, config):
     """Handle media types, enums, booleans, and array-specific settings."""
-    if schema.get("format") == "binary" or schema.get("contentMediaType") in MEDIA_TYPES:
-        process_input.set("type", "data")
-        process_input.set("format", "txt")
+    #if schema.get("format") == "binary" or schema.get("contentMediaType") in MEDIA_TYPES:
+    #   process_input.set("type", "data")
+    #    process_input.set("format", "txt")
 
     if schema_type == "boolean":
         process_input.set("truevalue", "True")
@@ -176,9 +178,9 @@ def handle_formats_and_enums(process_input, schema, schema_type, process_id, par
         #handle_array_inputs(process_input, schema["items"])
         #handle_array_inputs(process_input)
     
-    if schema_type == "object":# and 'items' in schema:
-        if not any(process_id == inp["process"] and param_name == inp["param_name"] for inp in config["input_data_params"]):
-            process_input.set("name", f"{process_input.attrib['name']}_object")
+    #if schema_type == "object":# and 'items' in schema:
+    #    if not any(process_id == inp["process"] and param_name == inp["param_name"] for inp in config["input_data_params"]):
+    #        process_input.set("name", f"{process_input.attrib['name']}_object")
 
 
 #def handle_array_inputs(process_input):#, items_schema):
@@ -225,6 +227,7 @@ def OGCAPIProcesses2Galaxy(config_file):
     command.text = f"<![CDATA[\n    Rscript '$__tool_directory__/{config['script']}'\n        --outputData '$output_data'\n    ]]>"
     tool.append(command)
     
+    
     #add configfiles
     configfiles = ET.Element("configfiles")
     configfiles_inputs = ET.Element("inputs", name="inputs", filename="inputs.json", data_style="paths")
@@ -244,28 +247,41 @@ def process_server_processes(server, processes_data, select_process, config):
     """Process each server's processes."""
     when_list_processes = []
 
-    for process in processes_data["processes"]:
+    # Sort processes alphabetically by ID
+    sorted_processes = sorted(
+        processes_data["processes"],
+        key=lambda p: p["id"]
+    )
+
+    for process in sorted_processes:
         if process["id"] in server.get("excluded_services", []):
             continue
         if not is_included_process(server, process):
             continue
 
-        process_details = load_json(f"{server['server_url']}processes/{process['id']}")
+        process_details = load_json(
+            f"{server['server_url']}processes/{process['id']}"
+        )
         if not process_details:
             continue
 
         add_process_option(select_process, process_details)
-        #print(process["id"])
+
         when_process = ET.Element("when", value=process["id"])
 
-        # Add process inputs
         for param in process_details["inputs"]:
-            process_input = create_process_input(param, process_details["inputs"][param], config, process["id"])
+            process_input = create_process_input(
+                param,
+                process_details["inputs"][param],
+                config,
+                process["id"]
+            )
             when_process.append(process_input)
 
         when_list_processes.append(when_process)
 
     return when_list_processes
+
 
 
 def is_included_process(server, process):

@@ -2,18 +2,23 @@
     "servers":[
         {
             "server_url": "https://aquainfra.ogc.igb-berlin.de/pygeoapi/",
-            "included_services": ["*"],
+            "included_services": [
+                "*"
+            ],
             "filter": "",
             "excluded_services": [
                 "hello-world",
-                "malta-test"
+                "malta-test",
+                "malta-groundwater",
+                "riverload-plot",
+                "syke-corine-stats-real-areas"
             ]
         }
     ],
     "id":"aquainfra_ogc_api_processes",
     "title":"AquaINFRA OGC API Processes",
-    "version":"0.7.0",
-    "profile":"22.05",
+    "version":"0.12.0",
+    "profile":"25.1",
     "description": "",
     "help": "Use the dropdown menu at the top to select the OGC API processes hosted on https://aquainfra.ogc.igb-berlin.de/pygeoapi/ and then complete the corresponding form to run the service.",
     "creator": {
@@ -93,10 +98,6 @@
         {
             "process": "syke-corine-stats-real-areas",
             "param_name": "input_url_shapefile"
-        },
-        {
-            "process": "mitgcm-resultplots",
-            "param_name": "netcdf_input_file"
         },
         {
             "process": "retrieve-biodiversity-data",
@@ -181,6 +182,66 @@
         {
             "process": "heat5advanced",
             "param_name": "assessment_indicators"
+        },
+        {
+            "process": "mitgcm-resultplot",
+            "param_name": "netcdf_input_file"
+        },
+        {
+            "process": "mitgcm-prep",
+            "param_name": "input_url_IC_OBS"
+        },
+        {
+            "process": "mitgcm-prep",
+            "param_name": "input_url_AF"
+        },
+        {
+            "process": "mitgcm-run-model",
+            "param_name": "preprocessing_output_directory"
+        },
+        {
+            "process": "filter-clip-clean-extent",
+            "param_name": "inputFile1_gpkg"
+        },
+        {
+            "process": "process-dasymetric-refinement",
+            "param_name": "inputFile1_gpkg"
+        },
+        {
+            "process": "process-dasymetric-refinement",
+            "param_name": "inputFile2_rds"
+        },
+        {
+            "process": "process-dasymetric-refinement",
+            "param_name": "inputFile3_gpkg"
+        },
+        {
+            "process": "process-interpolate-lau",
+            "param_name": "inputFile1_gpkg"
+        },
+        {
+            "process": "process-interpolate-lau",
+            "param_name": "inputFile2_gpkg"
+        },
+        {
+            "process": "process-interpolate-subbasins",
+            "param_name": "inputFile1_gpkg"
+        },
+        {
+            "process": "process-interpolate-subbasins",
+            "param_name": "inputFile2_gpkg"
+        },
+        {
+            "process": "process-create-visualizations",
+            "param_name": "inputFile1_rds"
+        },
+        {
+            "process": "process-create-visualizations",
+            "param_name": "inputFile2_gpkg"
+        },
+        {
+            "process": "process-create-visualizations",
+            "param_name": "inputFile3_gpkg"
         }
     ]
 }
