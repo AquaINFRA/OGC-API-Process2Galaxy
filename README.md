@@ -2,15 +2,15 @@
 
 ## Background
 
-Galaxy is a tool for creating readily sharable workflows composed of a tool chain. Users can rerun the workflow by uploading their own input files and configuring the input parameters of the tools. The concept of a tool in Galaxy (input -> processing -> output) is very simlilar to the way how OGC API Processes work. Such processes are hosted on the server of a provider and can be triggered by implementing requests which send the input settings to the process and obtain the result once the processing is done. So how can we integrate OGC API Processes into the Galaxy platform allowing users to run these remote processes from Galaxy and connect them to create configurable workflows?
+The Galaxy platform is an open-source, web-based environment for analyzing scientific data, especially in life-science fields but also more and more in the geosciences. It lets researchers run complex computational workflows through a user-friendly interface without needing to write code. Galaxy also emphasizes reproducibility and collaboration by making analyses, tools, and datasets easy to share and rerun.
+
+OGC API – Processes is a standard from the Open Geospatial Consortium for exposing computational processes (like models, transformations, or analyses) through a web API. It allows clients to discover available processes, inspect their inputs and outputs, and execute them using simple HTTP requests. The goal is to make geospatial processing interoperable, reusable, and easy to integrate into web and cloud-based workflows.
+
+Both Galaxy tools and OGC API – Processes follow an input–processing–output logic. In each case, users provide inputs, the system runs a computational process or tool, and the results are returned as outputs in the form of data, figures or similar. This shared logic makes both platforms modular, reproducible, and easy to integrate into larger automated workflows. So how can we integrate both approches? 
 
 ## Concept
 
-First, we tried to wrap a process in a Galaxy tool. To achieve that, we wrote an R script that took over the communication with the remote process and XML file to define the Galaxy tool. While this approach has proven to work (see, e.g., https://toolshed.g2.bx.psu.edu/repository?repository_id=767530b6e7057080) and highly customizable, it is not efficient for servers storing a high number of processes. Every process would require an own tool and deployment process. For this reason, we developed the OGC-API-Process2Galaxy tool. It generates a Galaxy tool that wraps OGC API Processes hosted on a server. The tool requests all processes hosted on the server defined in the config.json. Then, for each process, the tool requests the process description and generates the input parameters, output parameters, and commands. Single processes can be excluded or picked individually by specifying the process names in the corresponding fields in the config.json. The final result is a tool on Galaxy which provides users with a dropdown menu where users can select the process they want to use. Based on the selection, the corresponding UI is shown and users can just start filling the input parameters.
-
-## Example
-
-This [tool](https://toolshed.g2.bx.psu.edu/repository?repository_id=8e2fce20ecfc093f) was created using the OGC-API-Process2Galaxy software. Check this [history](https://usegalaxy.eu/u/markus.konkol/h/open-science-persistent-demonstrator-example) and this [workflow](https://usegalaxy.eu/u/markus.konkol/w/workflow-constructed-from-history-open-science-persistent-demonstrator-example) for an example. 
+We developed a wrapper tool that bridges OGC API – Processes and the Galaxy platform by translating remote geospatial processes into native Galaxy tools. The tool automatically generates a Galaxy XML definition from OGC API process descriptions, using the declared inputs and outputs to build the Galaxy user interface. Once wrapped, these remote processes behave like standard Galaxy tools, meaning they can be chained together into Galaxy workflows, while execution happens on the OGC API server. We're using lightweight .txt files containing links to input datasets, which are sent to the remote processes instead of transferring the actual data avoiding unnecessary data transfer. Also the results of a process are returned to Galaxy as links which can then be sent to the next process in the chain. 
 
 ## How to run
 
@@ -20,32 +20,25 @@ Step 2: `cd OGC-API-Process2Galaxy`
 
 Step 3: `npm install`
 
-Step 4: Add the URL to the server hosting the processes to config.json. Optionally, list the server that should be excluded in the corresponding field in the config.json, or pick only individual processes from the server.
+Step 4: Open the configuration file and provide the remote server URL and relevant metadata. You can also specify which OGC API processes should be included or excluded; using an asterisk (*) includes all available processes. It is important to define the parameters that represent input data (input_data_params), as these are mapped to Galaxy input fields and allow users to supply .txt files containing URLs to the input datasets.
 
-Step 5: `python3 OGCProcess2Galaxy.py config.json `
+Step 5: Run `python3 OGCProcess2Galaxy.py config.json`
+This generates a Galaxy XML file that defines the user interface for the wrapped processes. Together with the accompanying R script, this XML file forms a complete Galaxy tool that can be installed and executed within the Galaxy platform (see https://github.com/galaxyecology/tools-ecology/tree/master/tools/aquainfra_ogc_api_processes).
 
-The result is a Galaxy XML file defining the UI for the platform. Together with the R script, we have a Galaxy tool that can be submitted to the Galaxy platform. 
+## Integration into the Galaxy platform
+
+Step 1: Test the tool locally in a Galaxy environment, for example using Planemo, to ensure it works as expected.
+
+Step 2: Integrate the tool into the galaxyecology/tools-ecology repository: https://github.com/galaxyecology/tools-ecology
+
+Step 3: Create a pull request and verify that all automated tests pass. Galaxy developers will review the PR and merge it if approved. Once merged, the tool will become available on the Galaxy platform following the next regular deployment cycle (usually on Saturdays).
 
 ## Limitations
 
-### Performance
+The processes are not executed on the Galaxy platform itself but on a remote server. Therefore, an external service (e.g., a pygeoapi instance) hosting the OGC API – Processes is required. This server must provide sufficient computational resources, including CPU and storage; otherwise, performance may degrade or the service may fail when multiple users execute processes concurrently. Storage capacity is another important consideration, as all results (e.g., datasets, figures, and intermediate outputs) are stored on the remote server.
 
-The XML file is getting extremely large if there are several hundreds of processes. It worked smoothly on Galaxy for 70 processes but the browser got very slowly (almost not usable) for 700 processes. The truth is probabaly somewhere between these numbers. For servers hosting too many processes, our recommendation is to split the processes into two or more tools. 
+Since the processes run on a remote server, it is possible for them to be modified or updated independently of Galaxy. This means that even if a workflow in Galaxy is rerun with the same inputs, the underlying behavior or results of a process may differ without the platform detecting the change. Users should be aware that reproducibility is therefore dependent not only on Galaxy but also on the stability and versioning of the remote OGC API – Processes. Developers can help maintain trust and reproducibility by providing access to the GitHub or GitLab repositories hosting the OGC API – Processes. This allows users to verify whether any updates or changes have been made to the processes, helping to resolve doubts about workflow consistency. 
 
-To reduce the size a bit, we looked for repetitive patterns which can be replaced using macros. However, at the moment, this requires some manual work after the XML is generated. To do so, search for
+## Performance
 
-  `<option value="uint8">uint8</option>
-      <option value="uint16">uint16</option>
-      <option value="int16">int16</option>
-      <option value="int32">int32</option>
-      <option value="float">float</option>
-      <option value="double">double</option>` 
-in the XML document and replace this section with `<expand macro="out_options"/>`
-
-Another opportunity to reduce the XML size is to search for
-
-  `<option value="image/tiff">image/tiff</option>
-      <option value="image/jpeg">image/jpeg</option>
-      <option value="image/png">image/png</option>` 
-and replace it with `<expand macro="format_options"/>`
-
+When wrapping a large number of processes, the generated Galaxy XML file can become very large. While the tool performed well with approximately 70 processes, usability degraded significantly when scaling to around 700 processes, with the Galaxy interface becoming slow and difficult to use. In practice, the performance limit likely lies between these two extremes. For servers exposing a large number of processes, we recommend splitting them into multiple Galaxy tools to maintain responsiveness and usability.
