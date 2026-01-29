@@ -7,10 +7,10 @@
         <organization name="EOSC AquaINFRA" url="https://aquainfra.eu/"/>
     </creator>
     <expand macro="requirements"/>
-    <command detect_errors="exit_code">&lt;![CDATA[
+    <command detect_errors="exit_code"><![CDATA[
     Rscript '$__tool_directory__/aquainfra_ogc_api_processes.R'
         --outputData '$output_data'
-    ]]&gt;</command>
+    ]]></command>
     <configfiles>
         <inputs name="inputs" filename="inputs.json" data_style="paths"/>
     </configfiles>

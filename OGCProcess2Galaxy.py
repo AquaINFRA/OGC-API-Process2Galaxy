@@ -47,8 +47,8 @@ def save_xml(tool, filename="generic.xml"):
     """Save the generated XML file with proper formatting."""
     xml_string = ET.tostring(tool, encoding="unicode")
     formatted_xml = md.parseString(xml_string).toprettyxml(indent="    ")
-    #formatted_xml = formatted_xml.replace("&lt;", "<")
-    #formatted_xml = formatted_xml.replace("&gt;", ">")
+    formatted_xml = formatted_xml.replace("&lt;!", "<!")
+    formatted_xml = formatted_xml.replace("]&gt;", "]>")
 
     formatted_xml = "\n".join(line for line in formatted_xml.splitlines() if not line.strip().startswith("<?xml"))
 
