@@ -42,3 +42,9 @@ Since the processes run on a remote server, it is possible for them to be modifi
 ## Performance
 
 When wrapping a large number of processes, the generated Galaxy XML file can become very large. While the tool performed well with approximately 70 processes, usability degraded significantly when scaling to around 700 processes, with the Galaxy interface becoming slow and difficult to use. In practice, the performance limit likely lies between these two extremes. For servers exposing a large number of processes, we recommend splitting them into multiple Galaxy tools to maintain responsiveness and usability.
+
+## Funding
+
+European Commission. AquaINFRA - Infrastructure for Marine and Inland Water Research [101094434](https://cordis.europa.eu/project/id/101094434)
+
+Open Geospatial Consortium. Open Science Persistent Demonstrator 2024. 
