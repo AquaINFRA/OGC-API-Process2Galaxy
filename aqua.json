@@ -10,7 +10,6 @@
                 "hello-world",
                 "malta-test",
                 "malta-groundwater",
-                "riverload-plot",
                 "syke-corine-stats-real-areas"
             ]
         }
@@ -242,6 +241,26 @@
         {
             "process": "process-create-visualizations",
             "param_name": "inputFile3_gpkg"
+        },
+        {
+            "process": "riverload-plot",
+            "param_name": "url_corine_result"
+        },
+        {
+            "process": "riverload-plot",
+            "param_name": "riverload_table_url"
+        },
+        {
+            "process": "riverload-plot",
+            "param_name": "vemala_url"
+        },
+        {
+            "process": "corine-stats-real-areas-finland",
+            "param_name": "input_url_polygons"
+        },
+        {
+            "process": "corine-stats-real-areas-europe",
+            "param_name": "input_url_polygons"
         }
     ]
 }
