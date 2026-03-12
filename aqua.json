@@ -244,7 +244,7 @@
         },
         {
             "process": "riverload-plot",
-            "param_name": "url_corine_result"
+            "param_name": "corine_table_url"
         },
         {
             "process": "riverload-plot",

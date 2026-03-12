@@ -440,7 +440,7 @@
                 <param name="input_discharge_urls" label="Input discharge" optional="false" help="URL to the daily discharge data (date, value). If the data is divided into parts, please provide several URLs separated by a comma. All URLs need to start with http(s). (URL must be stored in a .txt file)" type="data" format="txt"/>
             </when>
             <when value="riverload-plot">
-                <param name="url_corine_result" label="Values per Area" optional="false" help="A link to the output result csv file of the selected polygon from the output of the CORINE tool. (URL must be stored in a .txt file)" type="data" format="txt"/>
+                <param name="corine_table_url" label="Values per Area" optional="false" help="A link to the output result csv file of the selected polygon from the output of the CORINE tool. (URL must be stored in a .txt file)" type="data" format="txt"/>
                 <param name="riverload_table_url" label="Riverload Table (URL)" optional="false" help="Output of loading tool: A link to a CSV table containing daily loading values (date, Q (m3/s), conc. (mg/l), load (kg/d). (URL must be stored in a .txt file)" type="data" format="txt"/>
                 <param name="vemala_url" label="Input modelled" optional="false" help="A link to the daily modelled data (CSV): A table containing modelled daily loading values (date, Q (m3/s), TOC load (1000 kg/day),...) (URL must be stored in a .txt file)" type="data" format="txt"/>
                 <param name="start_date" label="Input starting date" optional="false" value="" help="Starting date for plotting. Format: YYYY-MM-DD. Constraints: 2000-01-01 &lt; start_date &lt; 2024-12-31. For optimized usage, use the first day of the year YYYY-01-01." type="text">
