@@ -9,7 +9,6 @@
             "excluded_services": [
                 "hello-world",
                 "malta-test",
-                "malta-groundwater",
                 "syke-corine-stats-real-areas"
             ]
         }

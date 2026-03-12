@@ -34,6 +34,7 @@
                 <option value="heat4advanced">heat4advanced: Assessing Eutrophication: Compute Assessment Indicators</option>
                 <option value="heat5">heat5: Reproducing HEAT HOLAS results: Compute Assessment</option>
                 <option value="heat5advanced">heat5advanced: Assessing Eutrophication: Compute Assessment</option>
+                <option value="malta-groundwater">malta-groundwater: Malta Groundwater Model (SEAWAT)</option>
                 <option value="map-shapefile-points">map-shapefile-points: Spatial visualisation of regions and data points</option>
                 <option value="map-trends-static">map-trends-static: Spatial visualisation of regions and data points</option>
                 <option value="match-data">match-data: Combine and match biodiversity data from separate sources</option>
@@ -194,6 +195,11 @@
                 <param name="assessment_indicators" label="Assessment Indicators Table" optional="false" help="CSV file of calculated EQRS per assessment period per assessment unit (AssessmentIndicators.csv). (URL must be stored in a .txt file)" type="data" format="txt"/>
                 <param name="table_indicators" label="Table of Indicators" optional="true" help="A table listing the indicators. Needs the following column names: IndicatorID; CriteriaID; Name; Code; Parameters; Units; YearMin; YearMax; MonthMin; MonthMax; DepthMin; DepthMax; Metric; Response; Applied; Comments; GTC_HM; GTC_ML; STC_HM; STC_ML; SSC_HM; SSC_ML. Please ask HELCOM for details. Please provide a URL to the table as a CSV file." type="text"/>
                 <param name="table_indicator_units" label="Table of Indicator Units" optional="true" help="A table listing something about the indicators. Needs the following column names: IndicatorID; UnitID; ET; ACDEV; EQR_HG; EQR_GM; EQR_MP; EQR_PB; IW. Please ask HELCOM for details. Please provide a URL to the table as a CSV file." type="text"/>
+            </when>
+            <when value="malta-groundwater">
+                <param name="user_sealevels" label="Sea Level Projections (m)" optional="true" help="A list of sea level values (m), formatted as a single text string with brackets and commas. This allows testing different scenarios. Higher values (simulating sea-level rise) will increase pressure on the aquifer, pushing saltwater further inland (saltwater intrusion)." type="text"/>
+                <param name="sealevel_int" label="Stress Period Duration (Years)" optional="true" help="The duration, in years, for each individual stress period (i.e., for each value in the 'Sea Level Projections' string). The **Total Simulation Time** is this duration multiplied by the number of sea levels provided. (e.g., 30 sea levels * 1 year duration = 30-year simulation)." type="integer"/>
+                <param name="user_recharge" label="Groundwater Recharge Rate (m/day)" optional="true" help="The average rainfall recharge rate, applied uniformly across the model. Units must be in meters per day (m/day). Higher values (e.g., more rainfall) will help push freshwater toward the sea, counteracting saltwater intrusion." type="float"/>
             </when>
             <when value="map-shapefile-points">
                 <param name="regions" label="Study region or study subregions" optional="false" help="URL to the study region, or several regions, to classify the input data into groups of interest. Currently it has to be provided as a shapefile. It can be in any coordinate system and will be transformed to WGS84 during this process. (URL must be stored in a .txt file)" type="data" format="txt"/>
