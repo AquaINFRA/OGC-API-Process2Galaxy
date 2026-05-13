@@ -15,7 +15,7 @@
     ],
     "id":"aquainfra_ogc_api_processes",
     "title":"AquaINFRA OGC API Processes",
-    "version":"0.13.0",
+    "version":"0.14.0",
     "profile":"25.1",
     "description": "",
     "help": "Use the dropdown menu at the top to select the OGC API processes hosted on https://aquainfra.ogc.igb-berlin.de/pygeoapi/ and then complete the corresponding form to run the service.",
@@ -260,6 +260,50 @@
         {
             "process": "corine-stats-real-areas-europe",
             "param_name": "input_url_polygons"
+        },
+        {
+            "process": "netcdf-extract-fb-data",
+            "param_name": "source"
+        },
+        {
+            "process": "netcdf-scatter-plot",
+            "param_name": "input_csv"
+        },
+        {
+            "process": "netcdf-tile-plot",
+            "param_name": "input_csv"
+        },
+        {
+            "process": "netcdf-scatter-datax-vs-datay",
+            "param_name": "url_input_csv"
+        },
+        {
+            "process": "netcdf-scatter-datax-vs-datay",
+            "param_name": "url_input_waterbody"
+        },
+        {
+            "process": "netcdf-join-dataframes",
+            "param_name": "url_input_ferrybox_csv"
+        },
+        {
+            "process": "netcdf-join-dataframes",
+            "param_name": "url_input_river_logger_csv"
+        },
+        {
+            "process": "netcdf-assessment-area",
+            "param_name": "url_input_csv"
+        },
+        {
+            "process": "netcdf-assessment-area",
+            "param_name": "url_input_river_logger_csv"
+        },
+        {
+            "process": "netcdf-assessment-area",
+            "param_name": "url_input_waterbody"
+        },
+        {
+            "process": "netcdf-logger-extract",
+            "param_name": "url_thredds"
         }
     ]
 }
