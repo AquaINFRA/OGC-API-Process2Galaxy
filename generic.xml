@@ -382,6 +382,7 @@
                 <param name="waterbody_id_col" label="Waterbody ID column name in shapefile" optional="true" help="Waterbody ID column name in shapefile. Can be omitted." type="text"/>
                 <param name="latitude_min" label="Latitude minimum" optional="true" help="Latitude range to summarise across: Minimum latitude. Can be omitted." type="float"/>
                 <param name="latitude_max" label="Latitude maximum" optional="true" help="Latitude range to summarise across: Maximum latitude. Can be omitted." type="float"/>
+                <param name="study_area_layer" label="Study area layer" optional="true" help="Input of specific layer geometries if multiple are available in input waterbodies file." type="text"/>
             </when>
             <when value="netcdf-scatter-plot">
                 <param name="input_csv" label="Source" optional="false" help="Path to input URL containing at least datetime, parameter, value, and preferably latitude/longitude. (URL must be stored in a .txt file)" type="data" format="txt"/>
