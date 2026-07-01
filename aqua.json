@@ -304,6 +304,18 @@
         {
             "process": "netcdf-logger-extract",
             "param_name": "url_thredds"
+        },
+        {
+            "process": "swatplus-lulc-change",
+            "param_name": "input_project_url"
+        },
+        {
+            "process": "swatplus-lulc-change",
+            "param_name": "lulc_changes_csv_url"
+        },
+        {
+            "process": "swat-simulation",
+            "param_name": "TextInOut_URL"
         }
     ]
 }
