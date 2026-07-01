@@ -334,13 +334,13 @@
             <when value="netcdf-assessment-area">
                 <param name="url_input_csv" label="Input FerryBox CSV" optional="false" help="URL of input FerryBox CSV file. (URL must be stored in a .txt file)" type="data" format="txt"/>
                 <param name="url_input_river_logger_csv" label="Input river/logger CSV" optional="true" help="URL of input river/logger CSV file. (URL must be stored in a .txt file)" type="data" format="txt"/>
-                <param name="river_labeL_col" label="River name column" optional="true" help="Column specifying the name of river(s) plotted" type="text"/>
+                <param name="river_label_col" label="River name column" optional="true" help="Column specifying the name of river(s) plotted" type="text"/>
                 <param name="url_input_waterbody" label="Waterbodies" optional="true" help="URL of  Waterbodies shapefile/geojson. Can be omitted. (URL must be stored in a .txt file)" type="data" format="txt"/>
                 <param name="study_area_layer" label="Study area layer" optional="true" help="If Waterbodies is specified as geojson, layer name to plot is required." type="text"/>
             </when>
             <when value="netcdf-extract-fb-data">
-                <param name="source" label="source" optional="false" help="THREDDS URL to the NetCDF dataset (e.g. https://thredds.niva.no/thredds/dodsC/datasets/nrt/color_fantasy.nc). (URL must be stored in a .txt file)" type="data" format="txt"/>
-                <param name="parameters" label="Parameters" optional="true" help="Comma-separated list of parameters to extract (e.g. temperature,salinity,chlorophyll,turbidity). Use NULL (or omit) to extract all available parameters." type="text"/>
+                <param name="url_thredds" label="Source" optional="false" help="THREDDS URL to the NetCDF dataset (e.g. https://thredds.niva.no/thredds/dodsC/datasets/nrt/color_fantasy.nc). (URL must be stored in a .txt file)" type="data" format="txt"/>
+                <param name="parameters_array" label="Parameters" optional="true" help="Comma-separated list of parameters to extract (e.g. temperature,salinity,chlorophyll,turbidity). Use NULL (or omit) to extract all available parameters." type="text"/>
                 <param name="start_date" label="Start date" optional="true" help="Start date (YYYY-MM-DD). If provided, end date must also be provided. Use NULL to omit." type="text"/>
                 <param name="end_date" label="End date" optional="true" help="End date (YYYY-MM-DD). If provided, start date must also be provided. Use NULL to omit." type="text"/>
                 <param name="study_area_bbox" label="Boundary box" optional="true" help="Optional bounding box filter. Order: [lat_min, lon_min, lat_max, lon_max]. Example: {'bbox': [58.5, 9.5, 59.9, 11.9]}. Omit to use the full dataset extent." type="text"/>
@@ -348,10 +348,10 @@
             <when value="netcdf-join-dataframes">
                 <param name="url_input_ferrybox_csv" label="FerryBox dataframe CSV" optional="false" help="URL to FerryBox dataframe CSV file. (URL must be stored in a .txt file)" type="data" format="txt"/>
                 <param name="url_input_river_logger_csv" label="River/logger dataframe CSV" optional="false" help="URL to River/logger dataframe CSV file. (URL must be stored in a .txt file)" type="data" format="txt"/>
-                <param name="param_dataframe1" label="Parameter from first dataframe" optional="false" value="" help="Parameter from first dataframe" type="text">
+                <param name="param_dataframe1" label="Parameter from first dataframe" optional="false" value="" help="Parameter from first dataframe to join" type="text">
                     <validator type="empty_field" message="You must provide a value."/>
                 </param>
-                <param name="param_dataframe2" label="Parameter from second dataframe" optional="false" value="" help="Parameter from second dataframe" type="text">
+                <param name="param_dataframe2" label="Parameter from second dataframe" optional="false" value="" help="Parameter from second dataframe to join" type="text">
                     <validator type="empty_field" message="You must provide a value."/>
                 </param>
                 <param name="colname_station2" label="Station column name in second dataframe" optional="false" value="" help="Station column name in second dataframe" type="text">
@@ -368,33 +368,31 @@
                 </param>
             </when>
             <when value="netcdf-logger-extract">
-                <param name="source" label="source" optional="false" value="" help="THREDDS url to the NetCDF dataset (e.g. https://thredds.niva.no/thredds/dodsC/datasets/loggers/glomma/baterod.nc)." type="text">
-                    <validator type="empty_field" message="You must provide a value."/>
-                </param>
+                <param name="url_thredds" label="Source" optional="false" help="THREDDS url to the NetCDF dataset (e.g. https://thredds.niva.no/thredds/dodsC/datasets/loggers/glomma/baterod.nc). (URL must be stored in a .txt file)" type="data" format="txt"/>
                 <param name="start_date" label="Start date" optional="true" help="Start date (YYYY-MM-DD). If provided, end date must also be provided. Use NULL to omit." type="text"/>
                 <param name="end_date" label="End date" optional="true" help="End date (YYYY-MM-DD). If provided, start date must also be provided. Use NULL to omit." type="text"/>
-                <param name="Parameters" label="parameters" optional="true" help="List of parameters. Use null (or omit) to extract all available parameters." type="text"/>
+                <param name="parameters_array" label="Parameters" optional="true" help="List of parameters. Use null (or omit) to extract all available parameters." type="text"/>
             </when>
             <when value="netcdf-scatter-datax-vs-datay">
                 <param name="url_input_csv" label="Input joined CSV" optional="false" help="URL to Input joined CSV file. (URL must be stored in a .txt file)" type="data" format="txt"/>
                 <param name="url_input_waterbody" label="Waterbody shapefile" optional="true" help="Waterbody shapefile. Can be omitted. (URL must be stored in a .txt file)" type="data" format="txt"/>
-                <param name="waterbody_ids_to_summarize" label="Waterbody IDs/names to summarise across" optional="true" help="Waterbody IDs/names to summarise across. Can be omitted." type="text"/>
-                <param name="waterbody_id_col" label="Waterbody ID column name in shapefile" optional="true" help="Waterbody ID column name in shapefile. Can be omitted." type="text"/>
+                <param name="waterbody_ids_to_summarize_array" label="Waterbody IDs/names" optional="true" help="Waterbody IDs/names to summarise across. Can be omitted." type="text"/>
+                <param name="waterbody_id_col" label="Waterbody ID column name" optional="true" help="Waterbody ID column name in shapefile. Can be omitted." type="text"/>
                 <param name="latitude_min" label="Latitude minimum" optional="true" help="Latitude range to summarise across: Minimum latitude. Can be omitted." type="float"/>
                 <param name="latitude_max" label="Latitude maximum" optional="true" help="Latitude range to summarise across: Maximum latitude. Can be omitted." type="float"/>
-                <param name="study_area_layer" label="Study area layer" optional="true" help="Input of specific layer geometries if multiple are available in input waterbodies file." type="text"/>
+                <param name="study_area_layer" label="Study area layer" optional="true" help="Input of specific layer geometries if multiple are available in input waterbody file." type="text"/>
             </when>
             <when value="netcdf-scatter-plot">
-                <param name="input_csv" label="Source" optional="false" help="Path to input URL containing at least datetime, parameter, value, and preferably latitude/longitude. (URL must be stored in a .txt file)" type="data" format="txt"/>
-                <param name="parameter_x" label="x-axis paramater" optional="false" value="" help="Parameter name for x-axis (e.g. salinity)." type="text">
+                <param name="url_input_csv" label="Source" optional="false" help="Path to input URL containing at least datetime, parameter, value, and preferably latitude/longitude. (URL must be stored in a .txt file)" type="data" format="txt"/>
+                <param name="param1" label="x-axis paramater" optional="false" value="" help="Parameter name for x-axis (e.g. salinity)." type="text">
                     <validator type="empty_field" message="You must provide a value."/>
                 </param>
-                <param name="parameter_y" label="y-axis parameter" optional="false" value="" help="Parameter name for y-axis (e.g. chlorophyll)." type="text">
+                <param name="param2" label="y-axis parameter" optional="false" value="" help="Parameter name for y-axis (e.g. chlorophyll)." type="text">
                     <validator type="empty_field" message="You must provide a value."/>
                 </param>
             </when>
             <when value="netcdf-tile-plot">
-                <param name="input_csv" label="Input FerryBox data" optional="false" help="Path or URL to FerryBox CSV containing datetime, latitude, longitude, parameter and value. (URL must be stored in a .txt file)" type="data" format="txt"/>
+                <param name="url_input_csv" label="Input FerryBox data" optional="false" help="Path or URL to FerryBox CSV containing datetime, latitude, longitude, parameter and value. (URL must be stored in a .txt file)" type="data" format="txt"/>
                 <param name="start_date" label="Start date" optional="true" help="Optional start date (YYYY-MM-DD). Use null or omit for no filter." type="text"/>
                 <param name="end_date" label="End date" optional="true" help="Optional end date (YYYY-MM-DD). Use null or omit for no filter." type="text"/>
                 <param name="parameters_array" label="Parameters" optional="true" help="Optional list of parameters to plot. If omitted or empty, all available parameters are used." type="text"/>

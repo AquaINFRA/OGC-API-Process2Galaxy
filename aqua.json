@@ -263,15 +263,15 @@
         },
         {
             "process": "netcdf-extract-fb-data",
-            "param_name": "source"
+            "param_name": "url_thredds"
         },
         {
             "process": "netcdf-scatter-plot",
-            "param_name": "input_csv"
+            "param_name": "url_input_csv"
         },
         {
             "process": "netcdf-tile-plot",
-            "param_name": "input_csv"
+            "param_name": "url_input_csv"
         },
         {
             "process": "netcdf-scatter-datax-vs-datay",
