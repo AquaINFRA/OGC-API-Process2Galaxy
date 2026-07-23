@@ -15,7 +15,7 @@
     ],
     "id":"aquainfra_ogc_api_processes",
     "title":"AquaINFRA OGC API Processes",
-    "version":"0.15.0",
+    "version":"0.16.0",
     "profile":"25.1",
     "description": "",
     "help": "Use the dropdown menu at the top to select the OGC API processes hosted on https://aquainfra.ogc.igb-berlin.de/pygeoapi/ and then complete the corresponding form to run the service.",
@@ -316,6 +316,194 @@
         {
             "process": "swat-simulation",
             "param_name": "TextInOut_URL"
+        },
+        {
+            "process": "attach-legend-to-corineCLC",
+            "param_name": "inputFile1_corineYear_rds"
+        },
+        {
+            "process": "attach-legend-to-corineCLC",
+            "param_name": "inputFile2_corineCLC_rds"
+        },
+        {
+            "process": "calculate-weighting",
+            "param_name": "inputFile1_censusgridSelected_rds"
+        },
+        {
+            "process": "calculate-weighting",
+            "param_name": "inputFile2_corineCLCcropped_rds"
+        },
+        {
+            "process": "calculate-weighting",
+            "param_name": "inputFile3_corineYear_rds"
+        },
+        {
+            "process": "calculate-weighting",
+            "param_name": "inputFile4_clcLegend_rds"
+        },
+        {
+            "process": "calculate-weighting",
+            "param_name": "inputFile5_corUrbanValues_rds"
+        },
+        {
+            "process": "create-visualisations",
+            "param_name": "inputFile1_weightTable_rds"
+        },
+        {
+            "process": "create-visualisations",
+            "param_name": "inputFile2_clcLegend_rds"
+        },
+        {
+            "process": "create-visualisations",
+            "param_name": "inputFile3_coryear2018_rds"
+        },
+        {
+            "process": "create-visualisations",
+            "param_name": "inputFile4_cellStatistics_rds"
+        },
+        {
+            "process": "create-visualisations",
+            "param_name": "inputFile5_censusgrid_rds"
+        },
+        {
+            "process": "create-visualisations",
+            "param_name": "inputFile6_evaluateWeighted_rds"
+        },
+        {
+            "process": "create-visualisations",
+            "param_name": "inputFile7_catchment_gpkg"
+        },
+        {
+            "process": "create-visualisations",
+            "param_name": "inputFile8_popFocusYear_rds"
+        },
+        {
+            "process": "create-visualisations",
+            "param_name": "inputFile9_lauInCatchFocus_rds"
+        },
+        {
+            "process": "create-visualisations",
+            "param_name": "inputFile10_lauInCatchReference_rds"
+        },
+        {
+            "process": "create-visualisations",
+            "param_name": "inputFile11_corineCLCvalid_rds"
+        },
+        {
+            "process": "create-visualisations",
+            "param_name": "inputFile12_corineCLConlyPositive_rds"
+        },
+        {
+            "process": "create-visualisations",
+            "param_name": "inputFile13_refinement_rds"
+        },
+        {
+            "process": "create-visualisations",
+            "param_name": "inputFile14_metrics_rds"
+        },
+        {
+            "process": "create-visualisations",
+            "param_name": "inputFile15_metricsSimple_rds"
+        },
+        {
+            "process": "crop-and-mask-raster",
+            "param_name": "inputFile1_corineCLC_rds"
+        },
+        {
+            "process": "crop-and-mask-raster",
+            "param_name": "inputFile2_analysisExtent_gpkg"
+        },
+        {
+            "process": "dasymetric-refinement",
+            "param_name": "inputFile1_corineCLC_rds"
+        },
+        {
+            "process": "dasymetric-refinement",
+            "param_name": "inputFile2_corineYear_rds"
+        },
+        {
+            "process": "dasymetric-refinement",
+            "param_name": "inputFile3_lauInCatchment_rds"
+        },
+        {
+            "process": "dasymetric-refinement",
+            "param_name": "inputFile4_popFocusYear_rds"
+        },
+        {
+            "process": "dasymetric-refinement",
+            "param_name": "inputFile5_catchment_gpkg"
+        },
+        {
+            "process": "dasymetric-refinement",
+            "param_name": "inputFile6_weightTable_rds"
+        },
+        {
+            "process": "dasymetric-refinement",
+            "param_name": "inputFile7_buildings_rds"
+        },
+        {
+            "process": "data-intersect",
+            "param_name": "inputFile1_focus_rds"
+        },
+        {
+            "process": "data-intersect",
+            "param_name": "inputFile2_analysisExtent_gpkg"
+        },
+        {
+            "process": "evaluate-refinement",
+            "param_name": "inputFile1_refinementWeightedReference_rds"
+        },
+        {
+            "process": "evaluate-refinement",
+            "param_name": "inputFile2_refinementSimpleReference_rds"
+        },
+        {
+            "process": "evaluate-refinement",
+            "param_name": "inputFile3_censusgrid_rds"
+        },
+        {
+            "process": "evaluate-refinement",
+            "param_name": "inputFile4_corineCLC_rds"
+        },
+        {
+            "process": "get-analysis-extent",
+            "param_name": "inputFile1_lauFocusSelected_rds"
+        },
+        {
+            "process": "get-analysis-extent",
+            "param_name": "inputFile2_lauReferenceSelected_rds"
+        },
+        {
+            "process": "get-census-grid",
+            "param_name": "inputFile1_countries_rds"
+        },
+        {
+            "process": "get-corineCLC",
+            "param_name": "inputFile1_focusYear_rds"
+        },
+        {
+            "process": "get-eubucco-buildings",
+            "param_name": "inputFile1_catchment_gpkg"
+        },
+        {
+            "process": "get-eubucco-buildings",
+            "param_name": "inputFile2_countriesForCatchment_rds"
+        },
+        {
+            "process": "get-lau-data",
+            "param_name": "inputFile1_countries_rds"
+        },
+        {
+            "process": "keep-only-valid-corineCLCclasses",
+            "param_name": "inputFile1_corineCLC_rds"
+        },
+        {
+            "process": "keep-only-valid-corineCLCclasses",
+            "param_name": "inputFile2_corineYear_rds"
+        },
+        {
+            "process": "keep-only-valid-corineCLCclasses",
+            "param_name": "inputFile3_weightTable_rds"
         }
     ]
 }
