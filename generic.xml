@@ -1,4 +1,4 @@
-<tool id="aquainfra_ogc_api_processes" name="AquaINFRA OGC API Processes" version="0.14.0" profile="25.1">
+<tool id="aquainfra_ogc_api_processes" name="AquaINFRA OGC API Processes" version="0.15.0" profile="25.1">
     <description/>
     <macros>
         <import>macros.xml</import>
@@ -536,7 +536,7 @@
                 </param>
             </when>
             <when value="swat-simulation">
-                <param name="swatversion" label="SWAT version" optional="false" value="" help="Define the SWAT model version 'swatplus' or 'swat2012'. AquaINFRA has integrated the executable version rev60.5.7_64rel_linux for SWAT+ and rev688_64rel_linux for SWAT2012. Example: 'swatplus'." type="text">
+                <param name="swat_version" label="SWAT version" optional="false" value="" help="Define the SWAT model version 'swatplus' or 'swat2012'. AquaINFRA has integrated the executable version rev60.5.7_64rel_linux for SWAT+ and rev688_64rel_linux for SWAT2012. Example: 'swatplus'." type="text">
                     <validator type="empty_field" message="You must provide a value."/>
                 </param>
                 <param name="TextInOut_URL" label="URL to project folder" optional="false" help="Provide URL to zipped TxtInOut SWAT project folder. Important: Do not include the SWAT executable in that folder — AquaINFRA has integrated the executable version rev60.5.7_64rel_linux for SWAT+ and rev688_64rel_linux for SWAT2012. Example, SWAT+ La Tordera watershed (Catalonia, Spain) model calibrated for water quantity (period 2000-2022) (Batlle-Morera, et al, 2026. https://doi.org/10.23728/b2share.am3bh-05a34):  https://b2share.eudat.eu/records/am3bh-05a34/files/TxtInOut.zip?download=1 . (URL must be stored in a .txt file)" type="data" format="txt"/>
@@ -549,7 +549,7 @@
                     <validator type="empty_field" message="You must provide a value."/>
                 </param>
                 <param name="start_date" label="Start Date" optional="false" value="0" help="Start date of the simulation in the format yyyymmdd. Example: 20160101." type="integer"/>
-                <param name="years_skip" label="Number of years of warm-up time " optional="false" value="0" help="(optional) Integer value to define the number of simulation years that are skipped before writing SWAT model outputs. Example: 2." type="integer"/>
+                <param name="skip_years" label="Number of years of warm-up time " optional="false" value="0" help="(optional) Integer value to define the number of simulation years that are skipped before writing SWAT model outputs. Example: 2." type="integer"/>
                 <param name="end_date" label="End Date" optional="false" value="0" help="End date of the simulation in the format yyyymmdd. Example: 20201231." type="integer"/>
             </when>
             <when value="swatplus-lulc-change">
