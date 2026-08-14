@@ -15,7 +15,7 @@
     ],
     "id":"aquainfra_ogc_api_processes",
     "title":"AquaINFRA OGC API Processes",
-    "version":"0.16.0",
+    "version":"0.17.0",
     "profile":"25.1",
     "description": "",
     "help": "Use the dropdown menu at the top to select the OGC API processes hosted on https://aquainfra.ogc.igb-berlin.de/pygeoapi/ and then complete the corresponding form to run the service.",
@@ -504,6 +504,26 @@
         {
             "process": "keep-only-valid-corineCLCclasses",
             "param_name": "inputFile3_weightTable_rds"
+        },
+        {
+            "process": "swatplus-lulc-change",
+            "param_name": "input_project_url"
+        },
+        {
+            "process": "swatplus-lulc-change",
+            "param_name": "lulc_changes_csv_url"
+        },
+        {
+            "process": "swat-simulation",
+            "param_name": "TextInOut_URL"
+        },
+        {
+            "process": "swat-simulation",
+            "param_name": "par_cal"
+        },
+        {
+            "process": "swat-marine-connection",
+            "param_name": "swat_output_file"
         }
     ]
 }
