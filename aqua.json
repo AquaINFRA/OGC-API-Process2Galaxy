@@ -524,6 +524,18 @@
         {
             "process": "swat-marine-connection",
             "param_name": "swat_output_file"
+        },
+        {
+            "process": "ferrybox-river-eo-plot",
+            "param_name": "input1"
+        },
+        {
+            "process": "ferrybox-river-eo-plot",
+            "param_name": "input2"
+        },
+        {
+            "process": "ferrybox-river-eo-plot",
+            "param_name": "input3"
         }
     ]
 }
